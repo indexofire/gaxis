@@ -37,6 +37,26 @@ target_similarity = 0.85
 export GLM_API_KEY="…"        # or whatever api_key_env names
 ```
 
+### Model choice
+
+Reconstruction needs a model that can both **see** the figure and **write correct code**; that
+combination is rarer than vision judging. The loop tolerates weak code with deterministic repairs
+(missing `import matplotlib`, `plt.use` instead of `matplotlib.use`) and up to `max_rounds` revisions,
+but it cannot invent geometry a model did not understand.
+
+```bash
+pixi run gaxis reconstruct pdf-<sha8>/fig-1 --model glm-5.3-flash --timeout 900 --max-side 768
+```
+
+Measured on a 2026 *npj Science of Food* composite figure (crop to one panel, GLM-4.5V, 2 rounds):
+a Sankey panel reached 0.43 and a network panel 0.37 (both L3, structurally close but not
+pixel-close); a simple bar chart reached ~0.72 (L2) with `glm-5.3-flash`. Long code generation can
+exceed the request timeout on the newest vision model; raise `--timeout`, lower `--max-side`, or use
+a smaller panel.
+
+Recommendation: prefer author code (`reproduce`); use reconstruction for charts with one panel,
+provide `--data` when possible, and treat L3 reconstructions as style references, not evidence.
+
 ## Single figure
 
 ```bash

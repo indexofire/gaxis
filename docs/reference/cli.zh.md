@@ -96,6 +96,18 @@
 
 单图复现 → 分级 → 自动资产化 + KB 刷新。
 
+### `gaxis reconstruct MANIFEST_ID [options]`
+
+| 选项 | 说明 |
+|---|---|
+| `--data FILE` | 挂载进沙箱的输入表（`GAXIS_DATA`） |
+| `--engine podman\|local` | 沙箱引擎 |
+| `--rounds N` | 生成/修正轮数 |
+| `--target F` | 达到该相似度提前停止 |
+| `--repair` | 从作者脚本出发修复 |
+| `--model NAME` | 覆盖配置的视觉/代码模型 |
+| `--timeout S` / `--max-side PX` | 单请求超时与图片尺寸 |
+
 ### `gaxis reproduce-paper PAPER_ID [options]`
 
 | 选项 | 说明 |

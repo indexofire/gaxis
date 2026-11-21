@@ -922,6 +922,11 @@ def reconstruct_cmd(
     repair: bool = typer.Option(
         False, "--repair", help="start from the author's script and let the model fix it"
     ),
+    model: str | None = typer.Option(None, "--model", help="override the configured model"),
+    timeout: float | None = typer.Option(None, "--timeout", help="per-request timeout (s)"),
+    max_side: int | None = typer.Option(
+        None, "--max-side", help="image long side sent to the model"
+    ),
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     """LLM writes (or repairs) figure code; the sandbox grades it against the paper image."""
@@ -933,6 +938,9 @@ def reconstruct_cmd(
             rounds=rounds,
             target=target,
             repair=repair,
+            model=model,
+            timeout_s=timeout,
+            max_side=max_side,
         )
     except GaxisError as exc:
         _fail(exc)

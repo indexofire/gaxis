@@ -90,11 +90,13 @@ class ReconstructOutcome:
     manifest_path: Path
 
 
-def _endpoint(config: GaxisConfig) -> tuple[str, str, str, int, float, float]:
+def _endpoint(
+    config: GaxisConfig, model_override: str | None = None
+) -> tuple[str, str, str, int, float, float]:
     recon = config.reconstruct
     design = config.design
     base_url = (recon.base_url or design.base_url).rstrip("/")
-    model = recon.model or design.model
+    model = model_override or recon.model or design.model
     api_key_env = recon.api_key_env or design.api_key_env
     return base_url, model, api_key_env, recon.max_side, recon.timeout_s, recon.temperature
 
@@ -174,12 +176,24 @@ def _request_code(
     raise GaxisError("reconstruct_failed", f"model request failed: {last_error}")
 
 
+def _normalise_code(code: str) -> str:
+    """Deterministic fixes for mistakes that are pure syntax, not design decisions."""
+    code = code.strip()
+    if "plt.use(" in code and "matplotlib.use(" not in code:
+        code = code.replace("plt.use(", "matplotlib.use(")
+    if "import matplotlib" not in code and "matplotlib." in code:
+        code = "import matplotlib\n" + code
+    if "matplotlib.use(" in code and "import matplotlib\n" not in code:
+        code = "import matplotlib\n" + code
+    return code + "\n"
+
+
 def _extract_code(content: str) -> str:
     match = re.search(r"```(?:python|py)?\s*\n(.*?)```", content, re.S)
     code = match.group(1).strip() if match else content.strip()
     if "savefig" not in code:
         raise GaxisError("reconstruct_failed", "model returned no script with savefig")
-    return code + "\n"
+    return _normalise_code(code)
 
 
 def _pick_sandbox(config: GaxisConfig, engine: str | None) -> tuple[Sandbox, str, str]:
@@ -298,6 +312,9 @@ def reconstruct_manifest(
     data_root: Path,
     config: GaxisConfig,
     repair_code: str = "",
+    model_override: str | None = None,
+    timeout_override: float | None = None,
+    max_side_override: int | None = None,
 ) -> ReconstructOutcome:
     if not reference.is_file():
         raise GaxisError("reference_missing", f"reference figure not found: {reference}")
@@ -307,7 +324,7 @@ def reconstruct_manifest(
             f"reference must be a raster image, got {reference.suffix}",
             hint="render the paper figure to PNG first",
         )
-    base_url, model, key_env, max_side, timeout_s, temperature = _endpoint(config)
+    base_url, model, key_env, max_side, timeout_s, temperature = _endpoint(config, model_override)
     api_key = os.environ.get(key_env, "")
     local = any(host in base_url for host in ("127.0.0.1", "localhost"))
     if not api_key and not local:

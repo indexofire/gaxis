@@ -96,6 +96,18 @@ View the full manifest of a paper figure by id (code candidates, reproduction le
 
 Single-figure reproduction → grading → automatic assetization + KB refresh.
 
+### `gaxis reconstruct MANIFEST_ID [options]`
+
+| Option | Meaning |
+|---|---|
+| `--data FILE` | input table mounted into the sandbox (`GAXIS_DATA`) |
+| `--engine podman\|local` | sandbox engine |
+| `--rounds N` | generate/revise rounds |
+| `--target F` | stop at this similarity |
+| `--repair` | start from the author script |
+| `--model NAME` | override the configured vision/code model |
+| `--timeout S` / `--max-side PX` | per-request timeout and image size |
+
 ### `gaxis reproduce-paper PAPER_ID [options]`
 
 | Option | Description |

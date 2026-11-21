@@ -144,3 +144,12 @@ def test_repair_keeps_author_method_when_script_is_unchanged(
     assert stored.reproduction.method == "author_code"
     assert stored.reproduction.model is None
     assert not any(candidate.generated for candidate in stored.code_candidates)
+
+
+def test_normalise_code_repairs_common_imports() -> None:
+    from gaxis.repro.reconstruct import _normalise_code
+
+    fixed = _normalise_code("plt.use('Agg')\nimport matplotlib.pyplot as plt\nsavefig('x.png')\n")
+    assert fixed.startswith("import matplotlib\n")
+    assert "matplotlib.use(" in fixed
+    assert "plt.use(" not in fixed

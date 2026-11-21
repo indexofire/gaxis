@@ -13,7 +13,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   generated code candidates carry `generated: true`, and retrieval ranks author reproductions first
   at the same level. A generation that never runs is graded `none` and is not added as a candidate;
   a repair that leaves the author script unchanged stays `method = author_code`.
-- `[reconstruct]` configuration (inherits `[design]` endpoint/model/key when empty).
+- `[reconstruct]` configuration (inherits `[design]` endpoint/model/key when empty);
+  `reconstruct --model/--timeout/--max-side` overrides, and deterministic repairs for
+  common import mistakes (`plt.use` → `matplotlib.use`, missing `import matplotlib`).
 
 ## [0.1.0] — 2026-11-21
 

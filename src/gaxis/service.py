@@ -1065,6 +1065,9 @@ def reconstruct_chart(
     rounds: int | None = None,
     target: float | None = None,
     repair: bool = False,
+    model: str | None = None,
+    timeout_s: float | None = None,
+    max_side: int | None = None,
 ) -> ReconstructResult:
     """`reconstruct`: LLM writes (or repairs) a script; the sandbox grades it.
 
@@ -1110,6 +1113,9 @@ def reconstruct_chart(
         data_root=conf.data_root,
         config=conf.config,
         repair_code=repair_code,
+        model_override=model,
+        timeout_override=timeout_s,
+        max_side_override=max_side,
     )
     outcome.result.kb_refresh = _kb_refresh(outcome.manifest)
     return outcome.result

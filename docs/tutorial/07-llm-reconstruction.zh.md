@@ -35,6 +35,23 @@ target_similarity = 0.85
 export GLM_API_KEY="…"        # 或你的 api_key_env 指定的名字
 ```
 
+### 模型选择
+
+重建需要模型**既能看图、又能写对代码**，这种组合比纯视觉评审稀缺。循环能靠确定性修复
+（补 `import matplotlib`、把 `plt.use` 改成 `matplotlib.use`）和最多 `max_rounds` 轮修正容忍弱代码，
+但无法凭空补出模型没理解的几何。
+
+```bash
+pixi run gaxis reconstruct pdf-<sha8>/fig-1 --model glm-5.3-flash --timeout 900 --max-side 768
+```
+
+实测（2026 年 *npj Science of Food* 复合图，裁成单面板，GLM-4.5V，2 轮）：Sankey 面板 0.43、
+网络图面板 0.37（均为 L3，结构接近但像素不接近）；简单柱状图用 `glm-5.3-flash` 约 0.72（L2）。
+最新视觉模型生成长代码时可能超过请求超时；可提高 `--timeout`、降低 `--max-side`，或改用更小的面板。
+
+建议：优先作者代码（`reproduce`）；只对单面板图表用重建，尽量给 `--data`；把 L3 重建当作风格参考，
+而不是复现证据。
+
 ## 单图
 
 ```bash
