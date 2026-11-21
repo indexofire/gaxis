@@ -96,7 +96,9 @@ pixi run gaxis reconstruct pdf-<sha8>/fig-1 --data my_table.csv
 4. If similarity is below `target_similarity`, the model sees the rendered image, the similarity
    components and the traceback, and returns a corrected script.
 5. The best round is kept: script copied to `data/assets/code/…`, manifest updated, KB page
-   refreshed.
+   refreshed. Each run gets its own `data/recon/<paper>__<fig>/<timestamp>-<model>/` directory, so
+   a later run never overwrites an earlier image or its code; every round writes `attempt.json`
+   and the run writes `reconstruction.json`.
 
 The `level` still comes from the thresholds in `[reproduction]`; it describes visual closeness.
 `method` describes provenance. Both are stored, and retrieval sorts by level first, then

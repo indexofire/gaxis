@@ -86,7 +86,9 @@ pixi run gaxis reconstruct pdf-<sha8>/fig-1 --data my_table.csv
 2. 脚本先静态扫描，再在**离线沙箱**中运行（无网络、只读根、资源限制）；
 3. 渲染出的位图与论文图用与 `reproduce` 相同的可解释指标比对（相关度、MAD、边缘、墨量、长宽比）；
 4. 低于 `target_similarity` 时，把渲染图、相似度分解和 traceback 再交给模型，返回修正后的脚本；
-5. 保留最好的一轮：脚本复制到 `data/assets/code/…`，更新 manifest，刷新 KB 页面。
+5. 保留最好的一轮：脚本复制到 `data/assets/code/…`，更新 manifest，刷新 KB 页面。每次运行都有独立的
+   `data/recon/<paper>__<fig>/<时间戳>-<模型>/` 目录，后一次运行不会覆盖前一次的图或代码；每轮写
+   `attempt.json`，整次运行写 `reconstruction.json`。
 
 `level` 仍由 `[reproduction]` 阈值决定，描述**视觉接近程度**；`method` 描述**来源**。两者都入库，
 检索先按等级、再按 `author_code` 优先于 `llm_*` 排序。

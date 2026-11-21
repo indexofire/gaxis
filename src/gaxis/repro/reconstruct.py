@@ -18,6 +18,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -176,16 +177,65 @@ def _request_code(
     raise GaxisError("reconstruct_failed", f"model request failed: {last_error}")
 
 
+def _unclosed_quote(line: str) -> bool:
+    """True when a physical line ends inside a single/double-quoted string."""
+    if chr(34) * 3 in line or chr(39) * 3 in line:
+        return False
+    single = double = False
+    escaped = False
+    for char in line:
+        if escaped:
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif char == chr(39) and not double:
+            single = not single
+        elif char == chr(34) and not single:
+            double = not double
+        elif char == "#" and not single and not double:
+            break
+    return single or double
+
+
+def _join_multiline_strings(code: str, *, max_lines: int = 3) -> str:
+    """Join raw newlines inside one-line string literals (a common model mistake)."""
+    lines = code.splitlines()
+    merged: list[str] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        joins = 0
+        while _unclosed_quote(line) and index + 1 < len(lines) and joins < max_lines:
+            index += 1
+            joins += 1
+            line = line + "\\n" + lines[index].strip()
+        merged.append(line)
+        index += 1
+    return "\n".join(merged)
+
+
 def _normalise_code(code: str) -> str:
     """Deterministic fixes for mistakes that are pure syntax, not design decisions."""
-    code = code.strip()
-    if "plt.use(" in code and "matplotlib.use(" not in code:
-        code = code.replace("plt.use(", "matplotlib.use(")
-    if "import matplotlib" not in code and "matplotlib." in code:
-        code = "import matplotlib\n" + code
-    if "matplotlib.use(" in code and "import matplotlib\n" not in code:
-        code = "import matplotlib\n" + code
-    return code + "\n"
+    import ast
+
+    base = code.strip()
+    if "plt.use(" in base and "matplotlib.use(" not in base:
+        base = base.replace("plt.use(", "matplotlib.use(")
+    import re
+
+    has_matplotlib = re.search(r"^import matplotlib(\s|$)", base, re.MULTILINE)
+    if has_matplotlib is None and "matplotlib." in base:
+        base = "import matplotlib\n" + base
+    try:
+        ast.parse(base)
+    except SyntaxError:
+        joined = _join_multiline_strings(base)
+        try:
+            ast.parse(joined)
+        except SyntaxError:
+            return base + "\n"
+        base = joined
+    return base + "\n"
 
 
 def _extract_code(content: str) -> str:
@@ -345,7 +395,8 @@ def reconstruct_manifest(
         )
         if item
     )
-    base_dir = data_root / "recon" / _slug(manifest.manifest_id)
+    run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}-{_slug(model)}"
+    base_dir = data_root / "recon" / _slug(manifest.manifest_id) / run_id
     attempts: list[Attempt] = []
     code = repair_code
     for round_number in range(1, rounds + 1):

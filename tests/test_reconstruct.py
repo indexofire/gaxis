@@ -76,8 +76,12 @@ def test_reconstruction_runs_and_records_provenance(
     assert result.visual_similarity is not None
     assert Path(result.code_path).is_file()
     assert result.similarity_history
-    attempt_file = Path(tmp_path / "data" / "recon" / "pdf-xyz__fig-1" / "round-1" / "attempt.json")
+    attempt_file = next(
+        (tmp_path / "data" / "recon" / "pdf-xyz__fig-1").glob("*/round-1/attempt.json")
+    )
     assert attempt_file.is_file()
+    summary = attempt_file.parent.parent / "reconstruction.json"
+    assert summary.is_file()
     stored = load_manifest(manifest.manifest_id, Path(tmp_path / "data" / "manifests"))
     assert stored is not None
     assert stored.reproduction.method == "llm_reconstruction"
@@ -155,3 +159,14 @@ def test_normalise_code_repairs_common_imports() -> None:
     assert fixed.startswith("import matplotlib\n")
     assert "matplotlib.use(" in fixed
     assert "plt.use(" not in fixed
+
+
+def test_normalise_joins_multiline_string_literals() -> None:
+    import ast
+
+    from gaxis.repro.reconstruct import _normalise_code
+
+    broken = "ax.text(1, 2, 'Farm\n5.71%', ha='left')\nlabel = f\"{name}\n{value}%\"\n"
+    fixed = _normalise_code(broken)
+    ast.parse(fixed)
+    assert "'Farm\\n5.71%'" in fixed

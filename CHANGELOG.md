@@ -15,7 +15,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   a repair that leaves the author script unchanged stays `method = author_code`.
 - `[reconstruct]` configuration (inherits `[design]` endpoint/model/key when empty);
   `reconstruct --model/--timeout/--max-side` overrides, and deterministic repairs for
-  common import mistakes (`plt.use` → `matplotlib.use`, missing `import matplotlib`).
+  common model mistakes (missing `import matplotlib`, `plt.use`, raw newlines inside
+  string literals). Each run is timestamped (`data/recon/<fig>/<run-id>/`) with per-round
+  `attempt.json`, a run-level `reconstruction.json`, and no cross-run overwrites.
 
 ## [0.1.0] — 2026-11-21
 
