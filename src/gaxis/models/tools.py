@@ -219,6 +219,9 @@ class ChartAssetSummary(BaseModel):
         default=None, description="perceptual (dHash) similarity to the query image, 0-1"
     )
     has_code: bool = Field(default=False, description="a code candidate is recorded")
+    reproduction_method: str | None = Field(
+        default=None, description="author_code | llm_reconstruction | llm_repair | none"
+    )
 
 
 class SearchChartAssetsRequest(BaseModel):

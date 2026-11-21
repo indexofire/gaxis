@@ -79,7 +79,7 @@ def search_assets(
     for hit in hits:
         best[hit.slug] = max(best.get(hit.slug, 0.0), hit.score)
 
-    ranked: list[tuple[int, float, float, float, ChartAssetSummary]] = []
+    ranked: list[tuple[int, int, float, float, float, ChartAssetSummary]] = []
     for slug, score in sorted(best.items(), key=lambda item: item[1], reverse=True)[:fetch_limit]:
         page = kb.get_page(slug)
         if page is None:
@@ -110,6 +110,7 @@ def search_assets(
         similarity = front.get("visual_similarity")
         design_score = front.get("design_score")
         usefulness = front.get("usefulness_score")
+        method = str(front.get("reproduction_method") or "none")
         summary = ChartAssetSummary(
             asset_id=str(front.get("asset_id") or slug),
             paper_title=str(front["paper_title"]) if front.get("paper_title") else None,
@@ -124,19 +125,31 @@ def search_assets(
             usefulness_score=(float(usefulness) if isinstance(usefulness, (int, float)) else None),
             image_similarity=image_similarity,
             has_code=has_recorded_code,
+            reproduction_method=method,
         )
         design_rank = float(design_score) if isinstance(design_score, (int, float)) else None
         use_rank = float(usefulness) if isinstance(usefulness, (int, float)) else None
         image_rank = -1.0 if image_similarity is None else image_similarity
-        ranked.append((_rank(level), _combined(design_rank, use_rank), score, image_rank, summary))
+        method_rank = 2 if method == "author_code" else 1 if method.startswith("llm_") else 0
+        ranked.append(
+            (
+                _rank(level),
+                method_rank,
+                _combined(design_rank, use_rank),
+                score,
+                image_rank,
+                summary,
+            )
+        )
 
     if query_hash is not None:
         # the image is the query: similarity leads, evidence and design break ties
-        ranked.sort(key=lambda item: (item[3], item[0], item[1], item[2]), reverse=True)
+        ranked.sort(key=lambda item: (item[4], item[0], item[1], item[2]), reverse=True)
     else:
-        # level first, then the weighted design/usefulness score; text breaks ties
-        ranked.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
-    assets = [item[4] for item in ranked]
+        # level first, then provenance (author code before model reconstructions),
+        # then the weighted design/usefulness score; text breaks ties
+        ranked.sort(key=lambda item: (item[0], item[1], item[2], item[3]), reverse=True)
+    assets = [item[5] for item in ranked]
     if dedupe:
         assets = _dedupe_by_fingerprint(assets, image_cache)
     return assets[:k]

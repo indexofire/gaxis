@@ -36,6 +36,9 @@ class CodeCandidate(BaseModel):
     license: str | None = None
     pairing_confidence: float = 0.0
     code_sha256: str = Field(default="", description="hash of the stored code asset, when copied")
+    generated: bool = Field(
+        default=False, description="True when the script was written by the LLM, not the authors"
+    )
 
 
 class ReproductionState(BaseModel):
@@ -46,6 +49,9 @@ class ReproductionState(BaseModel):
     environment_lock: str | None = None
     render_output: str | None = None
     data_source: Literal["none", "user", "repo", "synthetic"] = "none"
+    method: Literal["none", "author_code", "llm_reconstruction", "llm_repair"] = "none"
+    model: str | None = None
+    attempts: int = 0
 
 
 class DesignFeatures(BaseModel):

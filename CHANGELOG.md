@@ -2,6 +2,19 @@
 
 Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
 
+## [Unreleased]
+
+### Added
+
+- **LLM reconstruction fallback** (`gaxis reconstruct`, `reproduce-paper --reconstruct-missing`): for
+  figures whose author code is missing or broken, a vision model writes a script; the same sandbox
+  runs it, the same comparator grades it, and a revision loop feeds the render plus similarity
+  components back. Provenance is explicit: `reproduction.method = llm_reconstruction` / `llm_repair`,
+  generated code candidates carry `generated: true`, and retrieval ranks author reproductions first
+  at the same level. A generation that never runs is graded `none` and is not added as a candidate;
+  a repair that leaves the author script unchanged stays `method = author_code`.
+- `[reconstruct]` configuration (inherits `[design]` endpoint/model/key when empty).
+
 ## [0.1.0] — 2026-11-21
 
 First working line: extraction + reproduction + knowledge base + design judge.

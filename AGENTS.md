@@ -109,7 +109,8 @@ pixi run gaxis kb status
 pixi run gaxis kb ingest [--force]
 pixi run gaxis kb search "rarefaction curve" --min-level L2
 pixi run gaxis kb search --schema data.tsv --tier gold --sheet   # data-shaped selection
-pixi run gaxis reproduce-paper pdf-<sha8> [--data table.csv] [--synthetic]
+pixi run gaxis reproduce-paper pdf-<sha8> [--data table.csv] [--synthetic] [--reconstruct-missing]
+pixi run gaxis reconstruct pdf-<sha8>/fig-1 [--data table.csv] [--repair]
 pixi run gaxis kb seed                     # verified builtin templates -> KB (idempotent)
 pixi run gaxis kb adopt pdf-<sha8>/fig-1   # reproduced paper script -> adaptable template
 pixi run gaxis adapt --data data.tsv --preset asm --query "bar chart"
@@ -296,5 +297,7 @@ dev/          untracked (owner-local): plan and decisions only
 
 - No genome/species data acquisition, no analysis pipelines, no metadata DB import (plan §1.2).
 - No LLM calls inside the render path. Figure generation is deterministic; retrieval and paper
-  parsing may use models later, but a render must be reproducible byte-for-byte given the manifest.
+  parsing may use models, but a render must be reproducible byte-for-byte given the manifest.
+  LLM figure reconstruction is a separate, explicitly labelled path (`reproduction.method`);
+  it never claims to be author-code reproduction.
 - No `stdio` MCP transport in production (ADR-02); it may exist for local debugging only.

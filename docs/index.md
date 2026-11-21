@@ -22,6 +22,7 @@ The core principle is a single sentence:
 - **Evidence binding**: every render writes a `manifest.json` containing the data hash, code hash, output geometry, and lint report.
 - **Figure selection**: give a one-sentence requirement, or just a data table, and it retrieves candidate figures from the knowledge base, generates a numbered contact sheet, then renders the one you pick.
 - **Paper figure reproduction**: parse the PDF → locate figures, captions, cited sections, and code repositories → run in a podman sandbox → visual comparison → L1/L2/L3 grading.
+- **LLM reconstruction fallback**: when author code is missing or broken, a vision model writes a new script and the sandbox grades it; the manifest records `method = llm_reconstruction`/`llm_repair`, never `author_code`.
 - **Code ingestion**: successfully reproduced scripts are automatically copied into the asset library and KB pages refreshed; verified templates can be re-bound to new data (`adapt`).
 - **Panel layout**: arrange rendered panels on a single page (vectors preserved), with optional `--uniform` to unify font sizes and geometry.
 - **Queues and self-healing**: checkpointed ingestion/reproduction queues, retries, stall reclamation, heartbeats, evidence verification.

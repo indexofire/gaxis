@@ -86,6 +86,12 @@ sheet 按返回顺序编号（`#1…`），终端也是同一顺序。若顺序�
 
 沙箱镜像不可用（podman 缺失、构建失败、拉取失败）。看 `sandbox_report.notes`。
 
+### 论文没有公开代码，或者代码已经跑不起来怎么办？
+
+用 `gaxis reconstruct <manifest_id>`（或批量 `reproduce-paper --reconstruct-missing`）。它让视觉模型
+写一个新脚本，再在沙箱里运行并与论文图比对；结果记录为 `method = llm_reconstruction` / `llm_repair`，
+不会冒充作者代码复现。适合图表（chart），不适合示意图、拼版和显微图。
+
 ### 为什么大多数真实论文跑不出 L1？
 
 两个常见原因：论文仓库可能不带原始数据；依赖没有锁定导致构建失败。gaxis 会明确分级与说明，

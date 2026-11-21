@@ -106,6 +106,24 @@ api_key_env = "GLM_API_KEY"
 max_side = 768
 ```
 
+## `[reconstruct]` — LLM-assisted reconstruction
+
+Fallback for figures without runnable author code: the model writes a script, the sandbox runs it
+and compares the render with the paper image. Results are recorded as
+`reproduction.method = llm_reconstruction` (or `llm_repair`) and never as an author reproduction.
+
+| Key | Default | Meaning |
+|---|---|---|
+| `enabled` | `false` | allow the batch fallback (`reproduce-paper --reconstruct-missing`) |
+| `base_url` | `""` | OpenAI-compatible endpoint; empty inherits `[design]` |
+| `model` | `""` | vision/code model; empty inherits `[design]` |
+| `api_key_env` | `""` | key env var; empty inherits `[design]` |
+| `max_rounds` | `3` | generate → render → compare → revise rounds |
+| `target_similarity` | `0.85` | stop early at this similarity |
+| `max_side` | `1024` | image long side sent to the model |
+| `timeout_s` | `300` | per model request |
+| `temperature` | `0.0` | deterministic generation |
+
 ## `[sandbox]` — Reproduction isolation
 
 | Key | Default | Description |

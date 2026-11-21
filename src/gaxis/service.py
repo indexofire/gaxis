@@ -43,6 +43,7 @@ from .models.composition import CompositionManifest
 from .models.lint import LintReport
 from .models.manifest import FigureManifest, FigureSource, OutputFile
 from .models.paper import ChartReproManifest, CodeCandidate
+from .models.reconstruct import ReconstructResult
 from .models.schema import ColumnKind, DataSchema, describe_data
 from .models.spec import ChartSpec, ChartType
 from .models.tools import (
@@ -78,6 +79,7 @@ from .quality import (
     score_manifest,
 )
 from .render.emit import emit_code
+from .repro.reconstruct import reconstruct_manifest
 from .repro.runner import reproduce_manifest
 from .spec.brief import build_plan, detect_chart_type
 from .spec.infer import infer_spec
@@ -1053,6 +1055,64 @@ def _kb_refresh(manifest: Any) -> str:
     if summary.failed:
         return "failed: " + summary.failed[0][1]
     return "refreshed" if summary.upserted else "unchanged"
+
+
+def reconstruct_chart(
+    manifest_id: str,
+    *,
+    data_path: Path | None = None,
+    engine: str | None = None,
+    rounds: int | None = None,
+    target: float | None = None,
+    repair: bool = False,
+) -> ReconstructResult:
+    """`reconstruct`: LLM writes (or repairs) a script; the sandbox grades it.
+
+    This is the fallback for figures without runnable author code. It never labels the
+    result as an author reproduction: ``reproduction.method`` and the generated code
+    candidate record the provenance.
+    """
+    conf = settings()
+    manifest = load_manifest(manifest_id, conf.manifests_dir)
+    if manifest is None:
+        raise GaxisError(
+            "manifest_not_found",
+            f"no paper figure manifest named {manifest_id!r}",
+            hint="run `gaxis ingest` first",
+        )
+    if not manifest.chart_file:
+        raise GaxisError(
+            "reference_missing",
+            f"{manifest_id} has no artwork to reconstruct from",
+            hint="caption-only figures cannot be reconstructed",
+        )
+    reference = conf.data_root / manifest.chart_file
+    repair_code = ""
+    if repair:
+        candidate = next(
+            (item for item in reversed(manifest.code_candidates) if not item.generated), None
+        )
+        if candidate is None or not Path(candidate.code_path).is_file():
+            raise GaxisError(
+                "code_required",
+                "repair needs an existing author script",
+                hint="pass --code path/to/script or run without --repair to generate one",
+            )
+        repair_code = Path(candidate.code_path).read_text(encoding="utf-8")
+    outcome = reconstruct_manifest(
+        manifest,
+        manifest_path=conf.manifests_dir / manifest_filename(manifest.manifest_id),
+        reference=reference,
+        data_path=Path(data_path).expanduser() if data_path else None,
+        engine=engine,
+        rounds=rounds or conf.config.reconstruct.max_rounds,
+        target=target or conf.config.reconstruct.target_similarity,
+        data_root=conf.data_root,
+        config=conf.config,
+        repair_code=repair_code,
+    )
+    outcome.result.kb_refresh = _kb_refresh(outcome.manifest)
+    return outcome.result
 
 
 def adopt_chart_asset(

@@ -48,7 +48,14 @@ class BatchSummary:
             "items": [item.__dict__ for item in self.items],
             "counts": {
                 status: sum(1 for item in self.items if item.status == status)
-                for status in ("reproduced", "needs_data", "needs_env", "skipped", "failed")
+                for status in (
+                    "reproduced",
+                    "reconstructed",
+                    "needs_data",
+                    "needs_env",
+                    "skipped",
+                    "failed",
+                )
             },
         }
 
@@ -93,6 +100,8 @@ def reproduce_paper(
     force: bool = False,
     timeout_s: float | None = None,
     synthetic_dir: Path | None = None,
+    reconstruct: bool = False,
+    reconstruct_rounds: int | None = None,
 ) -> BatchSummary:
     from .. import service
     from ..config import settings
@@ -193,7 +202,54 @@ def reproduce_paper(
                 data_source=source,
             )
         )
+    if reconstruct:
+        _reconstruct_fallbacks(
+            summary,
+            data_path=data_path,
+            engine=engine,
+            rounds=reconstruct_rounds,
+        )
     return summary
+
+
+def _reconstruct_fallbacks(
+    summary: BatchSummary,
+    *,
+    data_path: Path | None,
+    engine: str | None,
+    rounds: int | None,
+) -> None:
+    """Use the LLM reconstruction path only for figures without runnable author code."""
+    from .. import service
+
+    for index, item in enumerate(summary.items):
+        if item.status not in {"skipped", "needs_data", "needs_env", "failed"}:
+            continue
+        if "already graded" in item.reason:
+            continue
+        try:
+            result = service.reconstruct_chart(
+                item.manifest_id,
+                data_path=data_path,
+                engine=engine,
+                rounds=rounds,
+            )
+        except GaxisError as exc:
+            summary.items[index] = BatchItem(
+                item.manifest_id,
+                "failed",
+                level=item.level,
+                reason=f"reconstruction unavailable: {exc.code}: {exc.message}",
+                data_source=item.data_source,
+            )
+            continue
+        summary.items[index] = BatchItem(
+            item.manifest_id,
+            "reconstructed",
+            level=result.level,
+            reason=f"LLM reconstruction after {item.status} ({result.rounds} round(s))",
+            data_source=item.data_source,
+        )
 
 
 def reproduce_paper_with_summary(

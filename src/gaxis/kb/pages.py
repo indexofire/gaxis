@@ -52,6 +52,8 @@ def _frontmatter(manifest: ChartReproManifest) -> dict[str, object]:
         "figure_ref": manifest.figure_ref,
         "chart_type": grammar.chart_type.value if grammar.chart_type else None,
         "reproduction_level": reproduction.level,
+        "reproduction_method": reproduction.method if reproduction.method != "none" else None,
+        "reproduction_model": reproduction.model,
         "sandbox_run_status": reproduction.sandbox_run_status,
         "visual_similarity": reproduction.visual_similarity,
         "chart_quality_score": manifest.chart_quality_score,

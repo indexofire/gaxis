@@ -80,6 +80,24 @@ class DesignSettings(BaseModel):
     )
 
 
+class ReconstructSettings(BaseModel):
+    """LLM-assisted figure reconstruction: the model writes code, the sandbox judges it.
+
+    Disabled by default: this is the fallback for papers whose author code is missing or
+    does not run. Empty endpoint fields inherit `[design]`, so one vision key configures both.
+    """
+
+    enabled: bool = False
+    base_url: str = ""
+    model: str = ""
+    api_key_env: str = ""
+    max_rounds: int = Field(default=3, ge=1, le=6)
+    target_similarity: float = Field(default=0.85, ge=0.0, le=1.0)
+    max_side: int = Field(default=1024, ge=256, le=2048)
+    timeout_s: float = Field(default=300.0, gt=0, le=900)
+    temperature: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
 class QualitySettings(BaseModel):
     """Extraction-quality weights (see src/gaxis/quality.py). Calibrated, not guessed."""
 
@@ -167,6 +185,7 @@ class GaxisConfig(BaseModel):
     usefulness: UsefulnessSettings = Field(default_factory=UsefulnessSettings)
     ranking: RankingSettings = Field(default_factory=RankingSettings)
     design: DesignSettings = Field(default_factory=DesignSettings)
+    reconstruct: ReconstructSettings = Field(default_factory=ReconstructSettings)
     sandbox: SandboxSettings = Field(default_factory=SandboxSettings)
     reproduction: ReproductionSettings = Field(default_factory=ReproductionSettings)
     knowledge: KnowledgeSettings = Field(default_factory=KnowledgeSettings)

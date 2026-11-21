@@ -106,6 +106,23 @@ api_key_env = "GLM_API_KEY"
 max_side = 768
 ```
 
+## `[reconstruct]` — LLM 辅助重建
+
+作者代码缺失或无法运行时使用：模型写脚本，沙箱运行并与论文图比对。结果记录为
+`reproduction.method = llm_reconstruction`（或 `llm_repair`），绝不冒充作者代码复现。
+
+| 键 | 默认 | 含义 |
+|---|---|---|
+| `enabled` | `false` | 是否允许批量回退（`reproduce-paper --reconstruct-missing`） |
+| `base_url` | `""` | OpenAI 兼容端点；空则继承 `[design]` |
+| `model` | `""` | 视觉/代码模型；空则继承 `[design]` |
+| `api_key_env` | `""` | key 环境变量；空则继承 `[design]` |
+| `max_rounds` | `3` | 生成 → 渲染 → 比对 → 修正的轮数 |
+| `max_side` | `1024` | 送给模型的图片长边 |
+| `target_similarity` | `0.85` | 达到该相似度提前停止 |
+| `timeout_s` | `300` | 单次模型请求上限 |
+| `temperature` | `0.0` | 确定性生成 |
+
 ## `[sandbox]` — 复现隔离
 
 | 键 | 默认 | 说明 |

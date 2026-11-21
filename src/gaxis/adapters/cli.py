@@ -912,6 +912,47 @@ def adapt(
     typer.echo(result.lint.format_text())
 
 
+@app.command("reconstruct")
+def reconstruct_cmd(
+    manifest_id: str = typer.Argument(..., help="paper figure manifest id"),
+    data: Path | None = typer.Option(None, "--data", help="optional input table"),
+    engine: str | None = typer.Option(None, "--engine", help="podman | local"),
+    rounds: int | None = typer.Option(None, "--rounds", help="generate/fix rounds"),
+    target: float | None = typer.Option(None, "--target", help="stop at this similarity"),
+    repair: bool = typer.Option(
+        False, "--repair", help="start from the author's script and let the model fix it"
+    ),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """LLM writes (or repairs) figure code; the sandbox grades it against the paper image."""
+    try:
+        result = service.reconstruct_chart(
+            manifest_id,
+            data_path=data,
+            engine=engine,
+            rounds=rounds,
+            target=target,
+            repair=repair,
+        )
+    except GaxisError as exc:
+        _fail(exc)
+        return
+    if as_json:
+        _echo_json(json.loads(result.model_dump_json()))
+        return
+    typer.echo(f"manifest: {result.manifest_id}")
+    typer.echo(f"method:   {result.method}   model: {result.model}   rounds: {result.rounds}")
+    typer.echo(f"engine:   {result.engine}   level: {result.level}")
+    if result.visual_similarity is not None:
+        history = ", ".join(f"{value:.3f}" for value in result.similarity_history)
+        typer.echo(f"similarity: {result.visual_similarity:.3f}   history: [{history}]")
+    typer.echo(f"code:     {result.code_path}")
+    if result.failure_reason:
+        typer.echo(f"note:     {result.failure_reason}")
+    if result.kb_refresh:
+        typer.echo(f"kb:       {result.kb_refresh}")
+
+
 @app.command("reproduce-paper")
 def reproduce_paper_cmd(
     paper_id: str = typer.Argument(..., help="paper id, e.g. pdf-<sha8>"),
@@ -925,6 +966,14 @@ def reproduce_paper_cmd(
         help="generate labelled synthetic input when the paper's data is absent",
     ),
     force: bool = typer.Option(False, "--force", help="re-run figures already graded L1/L2"),
+    reconstruct_missing: bool = typer.Option(
+        False,
+        "--reconstruct-missing",
+        help="LLM-reconstruct figures whose author code is missing or does not run",
+    ),
+    rounds: int | None = typer.Option(
+        None, "--rounds", help="reconstruction rounds (default from config)"
+    ),
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     """Reproduce every suitable figure of one ingested paper."""
@@ -941,6 +990,8 @@ def reproduce_paper_cmd(
             engine=engine,
             synthetic=synthetic,
             force=force,
+            reconstruct=reconstruct_missing,
+            reconstruct_rounds=rounds,
         )
     except GaxisError as exc:
         _fail(exc)

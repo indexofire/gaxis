@@ -92,6 +92,7 @@ plugins:
             Paper reproduction: 论文复现 → 代码入库
             Multi-panel composition: 多面板拼版
             Queue and self-healing: 运维：队列、定时与自愈
+            LLM reconstruction: LLM 重建
 
 markdown_extensions:
   - admonition
@@ -136,6 +137,7 @@ nav:
       - Paper reproduction: tutorial/04-reproduce-paper.md
       - Multi-panel composition: tutorial/05-compose-panels.md
       - Queue and self-healing: tutorial/06-operations.md
+      - LLM reconstruction: tutorial/07-llm-reconstruction.md
   - Reference:
       - CLI: reference/cli.md
       - Configuration: reference/configuration.md

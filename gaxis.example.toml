@@ -68,6 +68,16 @@ vector = 0.13
 cited = 0.08
 crop_clean = 0.10
 
+[reconstruct]
+# Fallback for figures whose author code is missing or does not run. The vision model
+# writes a script; the sandbox runs it and compares the render with the paper image.
+# Empty base_url/model/api_key_env inherit [design], so one endpoint configures both.
+enabled = false
+max_rounds = 3
+target_similarity = 0.85
+max_side = 1024
+timeout_s = 300
+
 [sandbox]
 # rootless podman per ADR-11; "local" runs scripts with the current interpreter and
 # is for development only (no isolation, recorded as such in every report)
