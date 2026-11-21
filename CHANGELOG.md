@@ -13,11 +13,12 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   generated code candidates carry `generated: true`, and retrieval ranks author reproductions first
   at the same level. A generation that never runs is graded `none` and is not added as a candidate;
   a repair that leaves the author script unchanged stays `method = author_code`.
-- `[reconstruct]` configuration (inherits `[design]` endpoint/model/key when empty);
-  `reconstruct --model/--timeout/--max-side` overrides, and deterministic repairs for
-  common model mistakes (missing `import matplotlib`, `plt.use`, raw newlines inside
-  string literals). Each run is timestamped (`data/recon/<fig>/<run-id>/`) with per-round
-  `attempt.json`, a run-level `reconstruction.json`, and no cross-run overwrites.
+- `[reconstruct]` configuration (inherits `[design]` base_url/key when empty), default model
+  **`glm-5.3-flash`** with hidden thinking disabled and a `fallback_model` (`glm-4.5v`) used only
+  when the primary stays below L2; `reconstruct --model/--timeout/--max-side` overrides, and
+  deterministic repairs for common model mistakes (missing `import matplotlib`, `plt.use`, raw
+  newlines inside string literals). Each run is timestamped (`data/recon/<fig>/<run-id>/`) with
+  per-round `attempt.json`, a run-level `reconstruction.json`, and no cross-run overwrites.
 
 ## [0.1.0] — 2026-11-21
 

@@ -1102,21 +1102,79 @@ def reconstruct_chart(
                 hint="pass --code path/to/script or run without --repair to generate one",
             )
         repair_code = Path(candidate.code_path).read_text(encoding="utf-8")
-    outcome = reconstruct_manifest(
-        manifest,
-        manifest_path=conf.manifests_dir / manifest_filename(manifest.manifest_id),
-        reference=reference,
-        data_path=Path(data_path).expanduser() if data_path else None,
-        engine=engine,
-        rounds=rounds or conf.config.reconstruct.max_rounds,
-        target=target or conf.config.reconstruct.target_similarity,
-        data_root=conf.data_root,
-        config=conf.config,
-        repair_code=repair_code,
-        model_override=model,
-        timeout_override=timeout_s,
-        max_side_override=max_side,
-    )
+    manifest_path = conf.manifests_dir / manifest_filename(manifest.manifest_id)
+    try:
+        outcome = reconstruct_manifest(
+            manifest,
+            manifest_path=manifest_path,
+            reference=reference,
+            data_path=Path(data_path).expanduser() if data_path else None,
+            engine=engine,
+            rounds=rounds or conf.config.reconstruct.max_rounds,
+            target=target or conf.config.reconstruct.target_similarity,
+            data_root=conf.data_root,
+            config=conf.config,
+            repair_code=repair_code,
+            model_override=model,
+            timeout_override=timeout_s,
+            max_side_override=max_side,
+        )
+    except GaxisError:
+        fallback = conf.config.reconstruct.fallback_model
+        if not fallback or fallback == (model or conf.config.reconstruct.model):
+            raise
+        outcome = reconstruct_manifest(
+            manifest,
+            manifest_path=manifest_path,
+            reference=reference,
+            data_path=Path(data_path).expanduser() if data_path else None,
+            engine=engine,
+            rounds=rounds or conf.config.reconstruct.max_rounds,
+            target=target or conf.config.reconstruct.target_similarity,
+            data_root=conf.data_root,
+            config=conf.config,
+            repair_code=repair_code,
+            model_override=fallback,
+            timeout_override=timeout_s,
+            max_side_override=max_side,
+        )
+        outcome.result.kb_refresh = _kb_refresh(outcome.manifest)
+        return outcome.result
+
+    fallback = conf.config.reconstruct.fallback_model
+    primary_model = outcome.result.model
+    if fallback and fallback != primary_model and outcome.result.level not in {"L1", "L2"}:
+        snapshot = manifest_path.read_bytes() if manifest_path.is_file() else b""
+        try:
+            alternative = reconstruct_manifest(
+                manifest,
+                manifest_path=manifest_path,
+                reference=reference,
+                data_path=Path(data_path).expanduser() if data_path else None,
+                engine=engine,
+                rounds=rounds or conf.config.reconstruct.max_rounds,
+                target=target or conf.config.reconstruct.target_similarity,
+                data_root=conf.data_root,
+                config=conf.config,
+                repair_code=repair_code,
+                model_override=fallback,
+                timeout_override=timeout_s,
+                max_side_override=max_side,
+            )
+        except GaxisError:
+            if snapshot:
+                manifest_path.write_bytes(snapshot)
+            outcome.result.kb_refresh = _kb_refresh(outcome.manifest)
+            return outcome.result
+        better = (alternative.result.visual_similarity or -1) > (
+            outcome.result.visual_similarity or -1
+        )
+        if better:
+            outcome = alternative
+        elif snapshot:
+            manifest_path.write_bytes(snapshot)
+            outcome.result.kb_refresh = _kb_refresh(outcome.manifest)
+            return outcome.result
     outcome.result.kb_refresh = _kb_refresh(outcome.manifest)
     return outcome.result
 

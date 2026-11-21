@@ -89,8 +89,16 @@ class ReconstructSettings(BaseModel):
 
     enabled: bool = False
     base_url: str = ""
-    model: str = ""
+    # glm-5.3-flash is the newest vision model on the GLM coding endpoint (2026).
+    model: str = "glm-5.3-flash"
     api_key_env: str = ""
+    # GLM-5 models can spend the whole token budget on hidden reasoning and return
+    # empty content; reconstruction wants code, not deliberation.
+    disable_thinking: bool = True
+    max_tokens: int = Field(default=8000, ge=512, le=32000)
+    # Older vision models can still win on layout-heavy composites; when the primary
+    # model does not reach L2, try this one and keep the better render.
+    fallback_model: str = "glm-4.5v"
     max_rounds: int = Field(default=3, ge=1, le=6)
     target_similarity: float = Field(default=0.85, ge=0.0, le=1.0)
     max_side: int = Field(default=1024, ge=256, le=2048)

@@ -45,9 +45,13 @@ export GLM_API_KEY="…"        # 或你的 api_key_env 指定的名字
 pixi run gaxis reconstruct pdf-<sha8>/fig-1 --model glm-5.3-flash --timeout 900 --max-side 768
 ```
 
-实测（2026 年 *npj Science of Food* 复合图，裁成单面板，GLM-4.5V，2 轮）：Sankey 面板 0.43、
-网络图面板 0.37（均为 L3，结构接近但像素不接近）；简单柱状图用 `glm-5.3-flash` 约 0.72（L2）。
-最新视觉模型生成长代码时可能超过请求超时；可提高 `--timeout`、降低 `--max-side`，或改用更小的面板。
+默认模型是 **`glm-5.3-flash`**，并设置 `disable_thinking = true`（否则 GLM-5 可能把整个 token
+预算花在隐藏推理上，返回空内容）与 `max_tokens = 8000`。`fallback_model`（默认 `glm-4.5v`）仅在
+主模型低于 L2 时重试，保留更好的渲染。
+
+实测（2026 年 *npj Science of Food* 的完整 Fig. 2，2 轮）：`glm-5.3-flash` 达到 **0.612（L2）**；
+同一张图 `glm-4.5v` 为 0.436（L3）；`glm-4.6v` 跑不起来。简单柱状图上 `glm-5.3-flash` 约 0.72（L2）。
+新模型在这里既更快（关闭思考）也更好，但布局复杂的复合图仍停在 L2，达不到 L1。
 
 建议：优先作者代码（`reproduce`）；只对单面板图表用重建，尽量给 `--data`；把 L3 重建当作风格参考，
 而不是复现证据。

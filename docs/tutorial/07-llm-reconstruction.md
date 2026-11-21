@@ -48,11 +48,16 @@ but it cannot invent geometry a model did not understand.
 pixi run gaxis reconstruct pdf-<sha8>/fig-1 --model glm-5.3-flash --timeout 900 --max-side 768
 ```
 
-Measured on a 2026 *npj Science of Food* composite figure (crop to one panel, GLM-4.5V, 2 rounds):
-a Sankey panel reached 0.43 and a network panel 0.37 (both L3, structurally close but not
-pixel-close); a simple bar chart reached ~0.72 (L2) with `glm-5.3-flash`. Long code generation can
-exceed the request timeout on the newest vision model; raise `--timeout`, lower `--max-side`, or use
-a smaller panel.
+The shipped default is **`glm-5.3-flash`** with `disable_thinking = true` (without it, GLM-5 can
+spend the whole token budget on hidden reasoning and return empty content) and `max_tokens = 8000`.
+A `fallback_model` (default `glm-4.5v`) is tried only when the primary stays below L2, and the better
+render is kept.
+
+Measured on a 2026 *npj Science of Food* composite figure (full Fig. 2, 2 rounds):
+`glm-5.3-flash` reached **0.612 (L2)**; `glm-4.5v` reached 0.436 (L3) on the same figure;
+`glm-4.6v` did not produce runnable code. On a simple bar chart `glm-5.3-flash` reached ~0.72 (L2).
+The newest model is both faster (thinking disabled) and better here, but layout-heavy composites
+still land at L2, not L1.
 
 Recommendation: prefer author code (`reproduce`); use reconstruction for charts with one panel,
 provide `--data` when possible, and treat L3 reconstructions as style references, not evidence.

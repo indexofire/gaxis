@@ -71,8 +71,14 @@ crop_clean = 0.10
 [reconstruct]
 # Fallback for figures whose author code is missing or does not run. The vision model
 # writes a script; the sandbox runs it and compares the render with the paper image.
-# Empty base_url/model/api_key_env inherit [design], so one endpoint configures both.
+# Empty base_url/api_key_env inherit [design], so one endpoint configures both.
 enabled = false
+model = "glm-5.3-flash"       # newest available vision model; empty inherits [design]
+disable_thinking = true       # GLM-5 otherwise spends the token budget on reasoning
+max_tokens = 8000
+# older vision models can win on layout-heavy composites; used only when the primary
+# model stays below L2, and the better render is kept
+fallback_model = "glm-4.5v"
 max_rounds = 3
 target_similarity = 0.85
 max_side = 1024

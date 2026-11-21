@@ -116,13 +116,16 @@ and compares the render with the paper image. Results are recorded as
 |---|---|---|
 | `enabled` | `false` | allow the batch fallback (`reproduce-paper --reconstruct-missing`) |
 | `base_url` | `""` | OpenAI-compatible endpoint; empty inherits `[design]` |
-| `model` | `""` | vision/code model; empty inherits `[design]` |
+| `model` | `glm-5.3-flash` | vision/code model |
 | `api_key_env` | `""` | key env var; empty inherits `[design]` |
 | `max_rounds` | `3` | generate → render → compare → revise rounds |
 | `target_similarity` | `0.85` | stop early at this similarity |
 | `max_side` | `1024` | image long side sent to the model |
 | `timeout_s` | `300` | per model request |
 | `temperature` | `0.0` | deterministic generation |
+| `disable_thinking` | `true` | GLM-5 models otherwise spend the token budget on hidden reasoning |
+| `max_tokens` | `8000` | output cap for one generation |
+| `fallback_model` | `glm-4.5v` | retried only when the primary stays below L2; the better render wins |
 
 ## `[sandbox]` — Reproduction isolation
 

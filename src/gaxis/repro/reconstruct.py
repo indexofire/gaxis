@@ -93,13 +93,22 @@ class ReconstructOutcome:
 
 def _endpoint(
     config: GaxisConfig, model_override: str | None = None
-) -> tuple[str, str, str, int, float, float]:
+) -> tuple[str, str, str, int, float, float, int, bool]:
     recon = config.reconstruct
     design = config.design
     base_url = (recon.base_url or design.base_url).rstrip("/")
     model = model_override or recon.model or design.model
     api_key_env = recon.api_key_env or design.api_key_env
-    return base_url, model, api_key_env, recon.max_side, recon.timeout_s, recon.temperature
+    return (
+        base_url,
+        model,
+        api_key_env,
+        recon.max_side,
+        recon.timeout_s,
+        recon.temperature,
+        recon.max_tokens,
+        recon.disable_thinking,
+    )
 
 
 def _encode(path: Path, max_side: int) -> str:
@@ -114,6 +123,8 @@ def _request_code(
     max_side: int,
     timeout_s: float,
     temperature: float,
+    max_tokens: int,
+    disable_thinking: bool,
     reference: Path,
     caption: str,
     hints: str,
@@ -144,11 +155,14 @@ def _request_code(
         )
     if feedback:
         parts.append({"type": "text", "text": feedback})
-    payload = {
+    payload: dict[str, Any] = {
         "model": model,
         "temperature": temperature,
+        "max_tokens": max_tokens,
         "messages": [{"role": "user", "content": parts}],
     }
+    if disable_thinking and model.startswith("glm-5"):
+        payload["thinking"] = {"type": "disabled"}
     request = urllib.request.Request(  # noqa: S310 - configured endpoint
         f"{base_url}/chat/completions",
         data=json.dumps(payload).encode(),
@@ -374,7 +388,16 @@ def reconstruct_manifest(
             f"reference must be a raster image, got {reference.suffix}",
             hint="render the paper figure to PNG first",
         )
-    base_url, model, key_env, max_side, timeout_s, temperature = _endpoint(config, model_override)
+    (
+        base_url,
+        model,
+        key_env,
+        max_side,
+        timeout_s,
+        temperature,
+        max_tokens,
+        disable_thinking,
+    ) = _endpoint(config, model_override)
     api_key = os.environ.get(key_env, "")
     local = any(host in base_url for host in ("127.0.0.1", "localhost"))
     if not api_key and not local:
@@ -408,6 +431,8 @@ def reconstruct_manifest(
                 max_side=max_side,
                 timeout_s=timeout_s,
                 temperature=temperature,
+                max_tokens=max_tokens,
+                disable_thinking=disable_thinking,
                 reference=reference,
                 caption=manifest.caption,
                 hints=hints,
@@ -451,6 +476,8 @@ def reconstruct_manifest(
             max_side=max_side,
             timeout_s=timeout_s,
             temperature=temperature,
+            max_tokens=max_tokens,
+            disable_thinking=disable_thinking,
             reference=reference,
             caption=manifest.caption,
             hints=hints,

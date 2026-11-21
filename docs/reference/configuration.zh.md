@@ -115,13 +115,16 @@ max_side = 768
 |---|---|---|
 | `enabled` | `false` | 是否允许批量回退（`reproduce-paper --reconstruct-missing`） |
 | `base_url` | `""` | OpenAI 兼容端点；空则继承 `[design]` |
-| `model` | `""` | 视觉/代码模型；空则继承 `[design]` |
+| `model` | `glm-5.3-flash` | 视觉/代码模型 |
 | `api_key_env` | `""` | key 环境变量；空则继承 `[design]` |
 | `max_rounds` | `3` | 生成 → 渲染 → 比对 → 修正的轮数 |
 | `max_side` | `1024` | 送给模型的图片长边 |
 | `target_similarity` | `0.85` | 达到该相似度提前停止 |
 | `timeout_s` | `300` | 单次模型请求上限 |
 | `temperature` | `0.0` | 确定性生成 |
+| `disable_thinking` | `true` | 否则 GLM-5 会把 token 预算花在隐藏推理上 |
+| `max_tokens` | `8000` | 单次生成长度上限 |
+| `fallback_model` | `glm-4.5v` | 仅当主模型低于 L2 时重试，保留更好的渲染 |
 
 ## `[sandbox]` — 复现隔离
 

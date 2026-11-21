@@ -54,7 +54,7 @@ def _setup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, with_code: bool =
 
 
 def _endpoint(*args, **kwargs):
-    return ("http://127.0.0.1:9/v1", "fake-vision", "NO_KEY_NEEDED", 768, 30.0, 0.0)
+    return ("http://127.0.0.1:9/v1", "fake-vision", "NO_KEY_NEEDED", 768, 30.0, 0.0, 8000, True)
 
 
 def test_reconstruction_runs_and_records_provenance(
@@ -170,3 +170,33 @@ def test_normalise_joins_multiline_string_literals() -> None:
     fixed = _normalise_code(broken)
     ast.parse(fixed)
     assert "'Farm\\n5.71%'" in fixed
+
+
+def test_fallback_model_is_used_when_primary_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest = _setup(tmp_path, monkeypatch)
+
+    def endpoint(config, model_override=None, *args, **kwargs):
+        return (
+            "http://127.0.0.1:9/v1",
+            model_override or config.reconstruct.model,
+            "NO_KEY_NEEDED",
+            768,
+            30.0,
+            0.0,
+            8000,
+            True,
+        )
+
+    def request(**kwargs):
+        if kwargs["model"] == "glm-5.3-flash":
+            return "raise RuntimeError('primary model cannot write this')\n"
+        return DEMO_SCRIPT
+
+    monkeypatch.setattr("gaxis.repro.reconstruct._endpoint", endpoint)
+    monkeypatch.setattr("gaxis.repro.reconstruct._request_code", request)
+    result = reconstruct_chart(manifest.manifest_id, engine="local", rounds=1)
+    assert result.model == "glm-4.5v"
+    assert result.level in {"L1", "L2"}
+    assert Path(result.code_path).is_file()
