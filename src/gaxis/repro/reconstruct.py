@@ -372,6 +372,23 @@ def reconstruct_manifest(
         )
         attempt.round = round_number
         attempts.append(attempt)
+        (base_dir / f"round-{round_number}" / "attempt.json").write_text(
+            json.dumps(
+                {
+                    "round": round_number,
+                    "run_ok": attempt.run_ok,
+                    "similarity": attempt.similarity,
+                    "components": attempt.detail,
+                    "engine": attempt.engine,
+                    "image_id": attempt.image_id,
+                    "error": attempt.error,
+                    "outputs": [str(path) for path in attempt.outputs],
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
         if attempt.similarity is not None and attempt.similarity >= target:
             break
         if round_number == rounds:
@@ -460,6 +477,35 @@ def reconstruct_manifest(
         )
         for path in best.outputs
     ]
+    (base_dir / "reconstruction.json").write_text(
+        json.dumps(
+            {
+                "manifest_id": manifest.manifest_id,
+                "method": method,
+                "model": None if unchanged else model,
+                "reference": str(reference),
+                "target_similarity": target,
+                "rounds": [
+                    {
+                        "round": item.round,
+                        "run_ok": item.run_ok,
+                        "similarity": item.similarity,
+                        "components": item.detail,
+                        "error": item.error,
+                        "engine": item.engine,
+                        "image_id": item.image_id,
+                    }
+                    for item in attempts
+                ],
+                "best_round": best.round,
+                "level": grade.level,
+                "reason": grade.reason,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     result = ReconstructResult(
         manifest_id=manifest.manifest_id,
         method=method,

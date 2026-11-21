@@ -76,6 +76,8 @@ def test_reconstruction_runs_and_records_provenance(
     assert result.visual_similarity is not None
     assert Path(result.code_path).is_file()
     assert result.similarity_history
+    attempt_file = Path(tmp_path / "data" / "recon" / "pdf-xyz__fig-1" / "round-1" / "attempt.json")
+    assert attempt_file.is_file()
     stored = load_manifest(manifest.manifest_id, Path(tmp_path / "data" / "manifests"))
     assert stored is not None
     assert stored.reproduction.method == "llm_reconstruction"
