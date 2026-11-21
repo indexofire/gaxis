@@ -1,0 +1,31 @@
+name: check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: prefix-dev/setup-pixi@v0.8.8
+        with:
+          pixi-version: latest
+          cache: true
+      - name: Install environment
+        run: pixi install
+      - name: Lint, types, tests
+        run: pixi run check
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: prefix-dev/setup-pixi@v0.8.8
+        with:
+          pixi-version: latest
+          cache: true
+      - name: Build documentation (strict)
+        run: pixi run docs-build

@@ -1,0 +1,107 @@
+# gaxis configuration
+# Copy to ./gaxis.toml (project) or ~/.config/gaxis/config.toml (user).
+# Environment variables override file values: GAXIS_DATA_DIR, GAXIS_RENDER_TIMEOUT,
+# GAXIS_CONFIRM_MODE, GAXIS_CONFIRM_MIN_CONFIDENCE, GAXIS_INGEST_MODE, GAXIS_GBRAIN_HOME.
+
+# data_root = "./data"        # figures, manifests, envs, reports
+
+[confirmation]
+# auto   = ask the user only when the plan confidence is below min_confidence (default)
+# always = always confirm before rendering
+# never  = render without asking (discouraged for submissions)
+mode = "auto"
+min_confidence = 0.6
+
+[render]
+timeout_s = 180
+default_preset = "default"
+default_backend = "python"
+
+[ingest]
+# kb_first = show what the knowledge base already has, deep-parse only if the user says no
+# full     = parse the paper and reproduce immediately
+default_mode = "kb_first"
+allow_network = true
+timeout_s = 900
+min_quality = 0.0
+contact_email = ""                # set this: Unpaywall requires it for open-access lookup
+max_download_mb = 40
+with_code = true                  # look for the paper's repository and plotting scripts
+repo_timeout_s = 120
+max_repos = 2
+
+[design]
+# heuristic = offline objective signals only (no taste claim)
+# vision    = ask an OpenAI-compatible vision model to score the figure rubric
+# Verified on this stack (GLM coding plan): model = "glm-4.5v",
+# base_url = "https://open.bigmodel.cn/api/coding/paas/v4", api_key_env = "GLM_API_KEY".
+# Measured: AUC 0.991 on 22 curated figures vs 8 counterexamples (data/corpus/golden).
+judge = "heuristic"
+base_url = "https://api.openai.com/v1"
+model = "gpt-4o-mini"
+api_key_env = "OPENAI_API_KEY"
+timeout_s = 300
+max_side = 768          # vision input resolution; smaller = faster on CPU
+gold_score = 0.60       # >= select for golden set / retrieval priority
+dense_score = 0.45      # >= usable but dense; below is rejected
+
+[usefulness]
+# does this figure deserve reproduction? (design quality is judged separately)
+journal = 0.35
+statistics = 0.20
+verification = 0.20
+panels = 0.15
+caption = 0.10
+
+[ranking]
+# design leads; usefulness is a tie-breaker (weights are normalised)
+design_weight = 0.70
+usefulness_weight = 0.30
+
+[quality]
+# extraction-quality weights; `gaxis quality calibrate rankings.csv` proposes new ones
+caption = 0.28
+artwork = 0.18
+resolution = 0.14
+area = 0.09
+vector = 0.13
+cited = 0.08
+crop_clean = 0.10
+
+[sandbox]
+# rootless podman per ADR-11; "local" runs scripts with the current interpreter and
+# is for development only (no isolation, recorded as such in every report)
+backend = "podman"
+image = "gaxis-repro:py312"
+autobuild = true
+autobuild_packages = ["matplotlib==3.11.2", "numpy==2.5.5"]
+# Build a derived image per paper from its requirements.txt / DESCRIPTION (falls back to
+# `image` when the build fails, and records the resolved image id either way).
+per_paper_env = true
+# R reproduction: a prebuilt image with ggplot2/svglite/ragg (2.9 GB, pulled once).
+# Set r_packages to build your own layer instead.
+r_image = "gaxis-repro-r:4.5"
+r_base_image = "docker.io/rocker/tidyverse:4.5"   # ggplot2/ragg/scales preinstalled
+r_packages = ["svglite", "patchwork", "cowplot"]  # installed from CRAN at build time
+network = false            # containers get --network none
+memory = "4g"
+cpus = 2.0
+pids_limit = 256
+timeout_s = 300
+
+[reproduction]
+# grading thresholds; every level stores its reason in the manifest
+l1_similarity = 0.85
+l2_similarity = 0.55
+compare_size = 256
+
+[knowledge]
+enabled = true
+source = "paper-kb"
+# binary = "/path/to/gbrain"      # defaults to PATH, then scripts/gbrain.sh
+types = ["analysis"]              # gbrain page types searched
+auto_ingest = true                # ingest manifests after `ingest_paper --mode full`
+include_rejected_design = false   # keep 'reject' tier as extraction assets only, out of the KB
+# gbrain_home = "~/.local/share/gaxis/gbrain"
+timeout_s = 120
+retries = 3

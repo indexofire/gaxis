@@ -1,0 +1,55 @@
+# --- local state: never published -------------------------------------------
+# plans, decisions, demo data and scratch scripts (deliberately not versioned)
+/dev/
+
+# generated artifacts: figures, manifests, downloaded papers, repro runs,
+# calibration sheets, knowledge-base state
+/data/
+
+# vendored tooling installed by scripts/install_gbrain.sh (gbrain checkout, pinned bun)
+/vendor/
+
+# local configuration (gaxis.example.toml is the tracked template)
+/gaxis.toml
+.env
+.env.*
+
+# gbrain ownership markers (should not exist here; never commit if they do)
+*.gbrain-owner.json
+*.gbrain-owner.lock
+
+# --- python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+/dist/
+/build/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# --- pixi ------------------------------------------------------------------
+# pixi manages .pixi/.gitignore itself; the whole environment stays local
+.pixi/
+
+# --- docs site (built by `pixi run docs-build`) ---------------------------------
+/site/
+
+# --- documents and downloads (we generate or fetch these) ------------------
+# tests build their PDFs at runtime; a committed fixture would need a negation here
+*.pdf
+# ...except the tiny demo paper shipped with the tutorial
+!examples/demo/paper.pdf
+*.pdf.part
+*.zst
+*.tar.gz
+
+# --- editors / OS ----------------------------------------------------------
+*.log
+*.swp
+.DS_Store
+Thumbs.db

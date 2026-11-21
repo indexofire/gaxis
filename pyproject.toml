@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gaxis"
+version = "0.1.0"
+description = "Publication-grade figure rendering, adaptation and paper-figure reproduction"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "indexofire", email = "indexofire@gmail.com" }]
+dependencies = [
+  "pydantic>=2.7",
+  "typer>=0.12",
+  "structlog>=24.1",
+  "mcp>=1.2",
+]
+
+[project.optional-dependencies]
+style = ["matplotlib>=3.8", "numpy>=1.26"]
+parse = ["pymupdf>=1.24"]
+dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.10"]
+docs = ["mkdocs>=1.6", "mkdocs-material>=9.5", "mkdocs-static-i18n>=1.2"]
+
+[project.scripts]
+gaxis = "gaxis.adapters.cli:app"
+gaxis-mcp = "gaxis.mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gaxis"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+# example scripts are deliverables (read-only fixtures), not library code
+extend-exclude = ["examples"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "C4", "PT", "S", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/gaxis/render/templates/*.py" = ["E501"]
+# typer's API is Option(...) in defaults; B008 cannot be satisfied without losing type info.
+"src/gaxis/adapters/cli.py" = ["B008"]
+# Chinese keyword tables and briefs are intentional: fullwidth punctuation is content
+"src/gaxis/spec/brief.py" = ["RUF001", "RUF002", "RUF003"]
+"tests/test_brief.py" = ["RUF001", "RUF002", "RUF003"]
+"src/gaxis/parse/captions.py" = ["RUF001", "RUF002", "RUF003"]
+"tests/test_captions.py" = ["RUF001", "RUF002", "RUF003"]
+# tests may assert, shell out to our own module, and hit loopback URLs
+"tests/**" = ["S101", "S105", "S106", "S603", "S310"]
+# the executor runs scripts we emitted ourselves; argv never comes from user input
+"src/gaxis/exec/runner.py" = ["S603"]
+# curation scripts shell out to curl and tolerate broken exports in a corpus folder
+"scripts/*.py" = ["S603", "S607", "BLE001"]
+# sandbox modules drive podman/pip with fixed argv, and /tmp is a container tmpfs
+"src/gaxis/sandbox/*.py" = ["S603", "S607", "S108"]
+# public metadata XML (arXiv/PMC) and git-on-PATH are deliberate choices
+"src/gaxis/acquire/metadata.py" = ["S314"]
+"src/gaxis/acquire/repo.py" = ["S603", "S607"]
+"tests/test_sandbox_podman.py" = ["S108"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true

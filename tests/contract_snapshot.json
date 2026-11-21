@@ -1,0 +1,228 @@
+{
+  "contract_version": "v2.1",
+  "tools": {
+    "adapt_chart_code": {
+      "data_class": "D3",
+      "inputs": [
+        "asset_id",
+        "backend",
+        "data_path",
+        "dpi",
+        "dry_run",
+        "formats",
+        "preset",
+        "query"
+      ],
+      "outputs": [
+        "asset_ids",
+        "code_path",
+        "fallback_reason",
+        "figure_id",
+        "lint",
+        "not_implemented",
+        "outputs",
+        "source"
+      ]
+    },
+    "compose_panels": {
+      "data_class": "D3",
+      "inputs": [
+        "height_mm",
+        "labels",
+        "layout",
+        "out_dir",
+        "panel_ids",
+        "preset",
+        "uniform",
+        "width_mm"
+      ],
+      "outputs": [
+        "composition_id",
+        "created_at",
+        "generator",
+        "height_mm",
+        "layout",
+        "lint",
+        "output_pdf",
+        "output_png",
+        "panels",
+        "preset",
+        "uniform",
+        "width_mm"
+      ]
+    },
+    "describe_data_schema": {
+      "data_class": "D3",
+      "inputs": [
+        "data_path"
+      ],
+      "outputs": [
+        "data_schema",
+        "suggested_spec",
+        "summary"
+      ]
+    },
+    "get_chart_manifest": {
+      "data_class": "D1",
+      "inputs": [
+        "manifest_id"
+      ],
+      "outputs": [
+        "found",
+        "manifest",
+        "manifest_id",
+        "message"
+      ]
+    },
+    "health": {
+      "data_class": "D1",
+      "inputs": [],
+      "outputs": [
+        "data_root",
+        "message",
+        "ok",
+        "presets",
+        "python_backend",
+        "r_backend",
+        "stages",
+        "version"
+      ]
+    },
+    "ingest_paper": {
+      "data_class": "D1",
+      "inputs": [
+        "min_quality",
+        "mode",
+        "reproduce",
+        "source",
+        "timeout_s",
+        "with_code"
+      ],
+      "outputs": [
+        "charts_found",
+        "code_candidate_count",
+        "deep_parse_suggested",
+        "doi",
+        "figure_briefs",
+        "manifest_ids",
+        "matches",
+        "message",
+        "mode",
+        "needs_network",
+        "normalised_id",
+        "not_implemented",
+        "paper_id",
+        "pdf_url",
+        "repository_urls",
+        "reproduced",
+        "source",
+        "source_kind",
+        "title"
+      ]
+    },
+    "plan_chart_from_brief": {
+      "data_class": "D1",
+      "inputs": [
+        "backend",
+        "brief",
+        "k",
+        "preset"
+      ],
+      "outputs": [
+        "confirmation_mode",
+        "confirmation_threshold",
+        "degraded",
+        "matches",
+        "message",
+        "plan",
+        "requires_confirmation"
+      ]
+    },
+    "render_chart_from_data": {
+      "data_class": "D3",
+      "inputs": [
+        "annotate_values",
+        "backend",
+        "chart_type",
+        "data_path",
+        "dpi",
+        "formats",
+        "height_mm",
+        "hue",
+        "out_dir",
+        "palette",
+        "preset",
+        "source_asset",
+        "title",
+        "width_mm",
+        "x",
+        "xlabel",
+        "y",
+        "yerr",
+        "ylabel"
+      ],
+      "outputs": [
+        "code_path",
+        "duration_s",
+        "exec_stderr",
+        "exec_stdout",
+        "figure_id",
+        "lint",
+        "manifest",
+        "manifest_path",
+        "outputs"
+      ]
+    },
+    "reproduce_chart_code": {
+      "data_class": "D1",
+      "inputs": [
+        "allow_network",
+        "code_path",
+        "data_path",
+        "engine",
+        "manifest_id",
+        "timeout_s"
+      ],
+      "outputs": [
+        "code_path",
+        "code_sha256",
+        "engine",
+        "failure_reason",
+        "language",
+        "level",
+        "lint",
+        "manifest_id",
+        "manifest_path",
+        "not_implemented",
+        "outputs",
+        "run_status",
+        "sandbox_report",
+        "similarity_detail",
+        "visual_similarity"
+      ]
+    },
+    "search_chart_assets": {
+      "data_class": "D1",
+      "inputs": [
+        "chart_type",
+        "dedupe",
+        "design_tier",
+        "has_code",
+        "k",
+        "min_reproduction_level",
+        "preset",
+        "query",
+        "query_image_path",
+        "render_sheet",
+        "schema_path"
+      ],
+      "outputs": [
+        "assets",
+        "degraded",
+        "message",
+        "sheet_path",
+        "total"
+      ]
+    }
+  }
+}

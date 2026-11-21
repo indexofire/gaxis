@@ -1,0 +1,24 @@
+name = "nature"
+label = "Nature (family)"
+description = "Nature-family artwork: 89/183 mm, sans 5-8 pt, 600 dpi, editable vector, no chart junk."
+publisher = "Springer Nature"
+
+width_single_mm = 89.0
+width_double_mm = 183.0
+height_mm = 60.0
+height_double_mm = 120.0
+
+base_font_pt = 7.0
+label_font_pt = 8.0
+title_font_pt = 8.0
+line_width_pt = 0.5
+spine_width_pt = 0.5
+marker_size_pt = 3.0
+dpi = 600
+
+font_family = ["Arial", "Helvetica", "Liberation Sans", "Nimbus Sans"]
+palette = "okabe_ito"
+legend_frame = false
+grid = false
+spines = ["left", "bottom"]
+vector_required = true

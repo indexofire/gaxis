@@ -1,0 +1,24 @@
+name = "microbial_genomics"
+label = "Microbial Genomics (Microbiology Society)"
+description = "Microbiology Society: 90 mm single / 190 mm double, Arial 8 pt, 300-600 dpi."
+publisher = "Microbiology Society"
+
+width_single_mm = 90.0
+width_double_mm = 190.0
+height_mm = 65.0
+height_double_mm = 130.0
+
+base_font_pt = 8.0
+label_font_pt = 9.0
+title_font_pt = 9.0
+line_width_pt = 0.6
+spine_width_pt = 0.6
+marker_size_pt = 3.5
+dpi = 600
+
+font_family = ["Arial", "Helvetica", "Liberation Sans", "Nimbus Sans"]
+palette = "okabe_ito"
+legend_frame = false
+grid = false
+spines = ["left", "bottom"]
+vector_required = true

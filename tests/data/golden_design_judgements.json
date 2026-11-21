@@ -1,0 +1,215 @@
+{
+  "model": "vision:glm-4.5v",
+  "records": [
+    {
+      "file": "bad-05-clipped-axis.png",
+      "label": "bad",
+      "aesthetic": 0.7,
+      "visualization": 0.2,
+      "score": 0.45
+    },
+    {
+      "file": "bad-01-default-matplotlib.png",
+      "label": "bad",
+      "aesthetic": 0.5,
+      "visualization": 0.2,
+      "score": 0.35
+    },
+    {
+      "file": "bad-04-heavy-grid.png",
+      "label": "bad",
+      "aesthetic": 0.2,
+      "visualization": 0.2,
+      "score": 0.2
+    },
+    {
+      "file": "bad-03-pie-rainbow.png",
+      "label": "bad",
+      "aesthetic": 0.2,
+      "visualization": 0.1,
+      "score": 0.15
+    },
+    {
+      "file": "bad-02-rainbow-bars.png",
+      "label": "bad",
+      "aesthetic": 0.3,
+      "visualization": 0.2,
+      "score": 0.25
+    },
+    {
+      "file": "bad-06-three-d.png",
+      "label": "bad",
+      "aesthetic": 0.2,
+      "visualization": 0.1,
+      "score": 0.15
+    },
+    {
+      "file": "bad-07-excel-style.png",
+      "label": "bad",
+      "aesthetic": 0.3,
+      "visualization": 0.2,
+      "score": 0.25
+    },
+    {
+      "file": "bad-08-table-screenshot.png",
+      "label": "bad",
+      "aesthetic": 0.2,
+      "visualization": 0.3,
+      "score": 0.25
+    },
+    {
+      "file": "good-01.jpg",
+      "label": "good",
+      "aesthetic": 0.6,
+      "visualization": 0.4,
+      "score": 0.5
+    },
+    {
+      "file": "good-02.png",
+      "label": "good",
+      "aesthetic": 0.8,
+      "visualization": 0.7,
+      "score": 0.75
+    },
+    {
+      "file": "good-03.png",
+      "label": "good",
+      "aesthetic": 0.6,
+      "visualization": 0.7,
+      "score": 0.65
+    },
+    {
+      "file": "good-04.jpg",
+      "label": "good",
+      "aesthetic": 0.7,
+      "visualization": 0.6,
+      "score": 0.65
+    },
+    {
+      "file": "good-05.png",
+      "label": "good",
+      "aesthetic": 0.8,
+      "visualization": 0.8,
+      "score": 0.8
+    },
+    {
+      "file": "good-06.png",
+      "label": "good",
+      "aesthetic": 0.8,
+      "visualization": 0.7,
+      "score": 0.75
+    },
+    {
+      "file": "good-07.png",
+      "label": "good",
+      "aesthetic": 0.9,
+      "visualization": 0.9,
+      "score": 0.9
+    },
+    {
+      "file": "good-09.jpg",
+      "label": "good",
+      "aesthetic": 0.6,
+      "visualization": 0.5,
+      "score": 0.55
+    },
+    {
+      "file": "good-08.png",
+      "label": "good",
+      "aesthetic": 0.7,
+      "visualization": 0.6,
+      "score": 0.65
+    },
+    {
+      "file": "good-10.png",
+      "label": "good",
+      "aesthetic": 0.8,
+      "visualization": 0.6,
+      "score": 0.7
+    },
+    {
+      "file": "good-11.jpg",
+      "label": "good",
+      "aesthetic": 0.7,
+      "visualization": 0.6,
+      "score": 0.65
+    },
+    {
+      "file": "good-13.png",
+      "label": "good",
+      "aesthetic": 0.5,
+      "visualization": 0.6,
+      "score": 0.55
+    },
+    {
+      "file": "good-12.png",
+      "label": "good",
+      "aesthetic": 0.8,
+      "visualization": 0.7,
+      "score": 0.75
+    },
+    {
+      "file": "good-16.jpg",
+      "label": "good",
+      "aesthetic": 0.6,
+      "visualization": 0.5,
+      "score": 0.55
+    },
+    {
+      "file": "good-15.png",
+      "label": "good",
+      "aesthetic": 0.7,
+      "visualization": 0.5,
+      "score": 0.6
+    },
+    {
+      "file": "good-14.png",
+      "label": "good",
+      "aesthetic": 0.4,
+      "visualization": 0.5,
+      "score": 0.45
+    },
+    {
+      "file": "good-17.jpg",
+      "label": "good",
+      "aesthetic": 0.6,
+      "visualization": 0.5,
+      "score": 0.55
+    },
+    {
+      "file": "good-20.png",
+      "label": "good",
+      "aesthetic": 0.4,
+      "visualization": 0.5,
+      "score": 0.45
+    },
+    {
+      "file": "good-18.jpg",
+      "label": "good",
+      "aesthetic": 0.7,
+      "visualization": 0.6,
+      "score": 0.65
+    },
+    {
+      "file": "good-21.jpg",
+      "label": "good",
+      "aesthetic": 0.5,
+      "visualization": 0.6,
+      "score": 0.55
+    },
+    {
+      "file": "good-22.png",
+      "label": "good",
+      "aesthetic": 0.4,
+      "visualization": 0.5,
+      "score": 0.45
+    },
+    {
+      "file": "good-19.png",
+      "label": "good",
+      "aesthetic": 0.7,
+      "visualization": 0.5,
+      "score": 0.6
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+site_name: gaxis
+site_description: >-
+  Publication-grade figures from tidy data, and verified, reusable code from paper figures.
+site_url: https://indexofire.github.io/gaxis/
+repo_url: https://github.com/indexofire/gaxis
+repo_name: indexofire/gaxis
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  # Desktop: top tabs + section landing pages + right-hand TOC. The primary
+  # sidebar is hidden by stylesheets/extra.css; tablet/mobile keep the drawer.
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - navigation.path
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - search.suggest
+    - search.highlight
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+# search is declared first so Material keeps it; i18n then builds a localized
+# index per language. `suffix` means `page.md` is English and `page.zh.md` is
+# Chinese, with the header language selector configured by the plugin.
+plugins:
+  - search:
+      lang:
+        - en
+        - zh
+  - i18n:
+      docs_structure: suffix
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: zh
+          name: 简体中文
+          build: true
+          nav_translations:
+            Home: 首页
+            Quick start: 快速开始
+            Core concepts: 核心概念
+            Tutorials: 使用教程
+            Reference: 参考
+            CLI: 命令行
+            Configuration: 配置
+            MCP tool contract: MCP 工具契约
+            Journal presets and lint: 期刊预设与 lint
+            Service flows: 服务流程
+            Operations: 运维手册
+            Design quality: 设计质量
+            Vision judge: 视觉评审
+            Quality calibration: 质量校准
+            gbrain knowledge base: gbrain 知识库
+            bacmap integration: bacmap 集成
+            FAQ: 常见问题
+            Contributing: 参与开发
+            First figure: 第一张图：数据到交付
+            Plan or data to candidates: 需求或数据 → 选图
+            Template adaptation: 模板适配：改数据不改代码
+            Paper reproduction: 论文复现 → 代码入库
+            Multi-panel composition: 多面板拼版
+            Queue and self-healing: 运维：队列、定时与自愈
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Quick start: quickstart.md
+  - Core concepts: concepts.md
+  - Tutorials:
+      - tutorial/index.md
+      - First figure: tutorial/01-first-figure.md
+      - Plan or data to candidates: tutorial/02-plan-and-select.md
+      - Template adaptation: tutorial/03-adapt-template.md
+      - Paper reproduction: tutorial/04-reproduce-paper.md
+      - Multi-panel composition: tutorial/05-compose-panels.md
+      - Queue and self-healing: tutorial/06-operations.md
+  - Reference:
+      - CLI: reference/cli.md
+      - Configuration: reference/configuration.md
+      - MCP tool contract: mcp-tools.md
+      - Journal presets and lint: presets.md
+      - Service flows: service-flows.md
+      - Operations: ops.md
+      - Design quality: design-quality.md
+      - Vision judge: vision-judge.md
+      - Quality calibration: quality-calibration.md
+      - gbrain knowledge base: gbrain-integration.md
+      - bacmap integration: bacmap-integration.md
+  - FAQ: faq.md
+  - Contributing: contributing.md

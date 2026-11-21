@@ -1,0 +1,198 @@
+{
+  "judge": "vision:glm-4.5v",
+  "rubric": "v3.1",
+  "records": [
+    {
+      "file": "cand-03.png",
+      "label": "drop",
+      "aesthetic": 0.3,
+      "visualization": 0.3,
+      "score": 0.3,
+      "category": "plate"
+    },
+    {
+      "file": "cand-02.png",
+      "label": "borderline",
+      "aesthetic": 0.8,
+      "visualization": 0.9,
+      "score": 0.85,
+      "category": "chart"
+    },
+    {
+      "file": "cand-04.png",
+      "label": "drop",
+      "aesthetic": 0.3,
+      "visualization": 0.3,
+      "score": 0.3,
+      "category": "plate"
+    },
+    {
+      "file": "cand-05.png",
+      "label": "borderline",
+      "aesthetic": 0.8,
+      "visualization": 0.8,
+      "score": 0.8,
+      "category": "chart"
+    },
+    {
+      "file": "cand-06.png",
+      "label": "keep",
+      "aesthetic": 0.9,
+      "visualization": 0.8,
+      "score": 0.85,
+      "category": "plate"
+    },
+    {
+      "file": "cand-07.png",
+      "label": "borderline",
+      "aesthetic": 0.8,
+      "visualization": 0.9,
+      "score": 0.85,
+      "category": "plate"
+    },
+    {
+      "file": "cand-01.png",
+      "label": "keep",
+      "aesthetic": 0.9,
+      "visualization": 0.8,
+      "score": 0.85,
+      "category": "mixed"
+    },
+    {
+      "file": "cand-09.png",
+      "label": "borderline",
+      "aesthetic": 0.8,
+      "visualization": 0.8,
+      "score": 0.8,
+      "category": "chart"
+    },
+    {
+      "file": "cand-11.png",
+      "label": "drop",
+      "aesthetic": 0.8,
+      "visualization": 0.5,
+      "score": 0.65,
+      "category": "chart"
+    },
+    {
+      "file": "cand-10.png",
+      "label": "drop",
+      "aesthetic": 0.3,
+      "visualization": 0.3,
+      "score": 0.3,
+      "category": "plate"
+    },
+    {
+      "file": "cand-08.png",
+      "label": "keep",
+      "aesthetic": 0.8,
+      "visualization": 0.6,
+      "score": 0.7,
+      "category": "mixed"
+    },
+    {
+      "file": "cand-14.png",
+      "label": "keep",
+      "aesthetic": 0.8,
+      "visualization": 0.8,
+      "score": 0.8,
+      "category": "plate"
+    },
+    {
+      "file": "cand-13.png",
+      "label": "borderline",
+      "aesthetic": 0.6,
+      "visualization": 0.5,
+      "score": 0.55,
+      "category": "chart"
+    },
+    {
+      "file": "cand-12.png",
+      "label": "keep",
+      "aesthetic": 0.9,
+      "visualization": 0.8,
+      "score": 0.85,
+      "category": "plate"
+    },
+    {
+      "file": "cand-15.png",
+      "label": "borderline",
+      "aesthetic": 0.4,
+      "visualization": 0.3,
+      "score": 0.35,
+      "category": "mixed"
+    },
+    {
+      "file": "cand-18.png",
+      "label": "borderline",
+      "aesthetic": 0.7,
+      "visualization": 0.3,
+      "score": 0.5,
+      "category": "chart"
+    },
+    {
+      "file": "cand-16.png",
+      "label": "keep",
+      "aesthetic": 0.9,
+      "visualization": 0.6,
+      "score": 0.75,
+      "category": "mixed"
+    },
+    {
+      "file": "cand-17.png",
+      "label": "keep",
+      "aesthetic": 0.6,
+      "visualization": 0.4,
+      "score": 0.5,
+      "category": "mixed"
+    },
+    {
+      "file": "cand-19.png",
+      "label": "borderline",
+      "aesthetic": 0.7,
+      "visualization": 0.5,
+      "score": 0.6,
+      "category": "mixed"
+    },
+    {
+      "file": "cand-23.png",
+      "label": "drop",
+      "aesthetic": 0.3,
+      "visualization": 0.3,
+      "score": 0.3,
+      "category": "schematic"
+    },
+    {
+      "file": "cand-24.png",
+      "label": "drop",
+      "aesthetic": 0.4,
+      "visualization": 0.2,
+      "score": 0.3,
+      "category": "schematic"
+    },
+    {
+      "file": "cand-20.png",
+      "label": "drop",
+      "aesthetic": 0.6,
+      "visualization": 0.7,
+      "score": 0.65,
+      "category": "chart"
+    },
+    {
+      "file": "cand-21.png",
+      "label": "keep",
+      "aesthetic": 0.7,
+      "visualization": 0.5,
+      "score": 0.6,
+      "category": "plate"
+    },
+    {
+      "file": "cand-22.png",
+      "label": "keep",
+      "aesthetic": 0.9,
+      "visualization": 0.6,
+      "score": 0.75,
+      "category": "mixed"
+    }
+  ]
+}
