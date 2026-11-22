@@ -24,8 +24,8 @@
 
 | 选项 | 说明 |
 |---|---|
-| `--chart {bar,stacked_bar,line,scatter,box,heatmap}` | 图型（默认由数据推断） |
-| `--x/--y/--hue/--yerr` | 编码列名 |
+| `--chart {bar,stacked_bar,line,scatter,box,heatmap,network}` | 图型（默认由数据推断；network 需显式指定） |
+| `--x/--y/--hue/--yerr/--weight` | 编码列名（network 用 source/target/weight） |
 | `--backend python\|r` | matplotlib 或 ggplot2 |
 | `--preset NAME` | 期刊预设（默认 `default`） |
 | `--palette NAME` | 覆盖预设调色板 |
@@ -95,6 +95,16 @@
 ### `gaxis reproduce MANIFEST_ID --code SCRIPT [--data FILE] [--engine podman\|local] [--allow-network]`
 
 单图复现 → 分级 → 自动资产化 + KB 刷新。
+
+### `gaxis analysis list` / `gaxis analysis run`
+
+| 命令 | 说明 |
+|---|---|
+| `gaxis analysis list [--json]` | 可用分析 recipe、输入契约、输出 |
+| `gaxis analysis run amr-cooccurrence --input TABLE [--out DIR] [--min-prevalence F] [--min-support N] [--weight jaccard\|count]` | 表 → `nodes.csv` + `edges.csv` + `analysis.json` |
+
+AMR recipe 只消费已有的基因结果（bacmap/ABRicate），不重跑 AMR 调用。渲染：
+`--chart network --x source --y target --weight weight`。
 
 ### `gaxis reconstruct MANIFEST_ID [options]`
 

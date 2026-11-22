@@ -26,6 +26,12 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Analysis recipes + network chart**: `gaxis analysis run amr-cooccurrence` computes AMR gene
+  co-occurrence from a long `sample,gene[,gene_class]` table (Jaccard/shared support, input hash,
+  `analysis.json`) and `gaxis render --chart network --x source --y target --weight weight` renders
+  a circular network in both matplotlib and ggplot2. It consumes gene calls from bacmap/ABRicate
+  and deliberately does not re-run AMR calling. Contract v2.2 (`RenderRequest.weight`, `network`).
+
 ## [0.1.0] — 2026-11-21
 
 First working line: extraction + reproduction + knowledge base + design judge.

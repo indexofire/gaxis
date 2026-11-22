@@ -10,6 +10,7 @@
 | [04 论文复现 → 代码入库](04-reproduce-paper.zh.md) | L1/L2/L3 评级、代码资产、可检索页面 | 是 | 是 |
 | [05 多面板拼版](05-compose-panels.zh.md) | 一页矢量多面板图 + 合成 manifest | 否 | 否 |
 | [06 运维](06-operations.zh.md) | 自动入库队列、定时任务、自愈检查 | 是 | 是 |
+| [08 AMR 共现网络](08-amr-network.zh.md) | 表 → 共现边 → 画网络图，不重跑 AMR | 否 | 否 |
 
 ## 建议的练习顺序
 

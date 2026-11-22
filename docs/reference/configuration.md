@@ -126,6 +126,7 @@ and compares the render with the paper image. Results are recorded as
 | `disable_thinking` | `true` | GLM-5 models otherwise spend the token budget on hidden reasoning |
 | `max_tokens` | `8000` | output cap for one generation |
 | `fallback_model` | `glm-4.5v` | retried only when the primary stays below L2; the better render wins |
+| `require_data` | `true` | generated code must read `GAXIS_DATA`; hardcoded scripts are rejected (`data_not_used`) |
 
 ## `[sandbox]` — Reproduction isolation
 

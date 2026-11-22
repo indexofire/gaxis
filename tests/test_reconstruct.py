@@ -16,17 +16,39 @@ from gaxis.service import reconstruct_chart
 from .manifest_factory import make_manifest
 
 DEMO_SCRIPT = """\
+import csv
+import os
+
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+labels = ['WT', 'dpsA', 'rpoS', 'hfq']
+values = [120.0, 85.0, 150.0, 95.0]
+path = os.environ.get('GAXIS_DATA')
+if path:
+    with open(path, newline='') as handle:
+        rows = list(csv.DictReader(handle))
+    labels = [row['genotype'] for row in rows]
+    values = [float(row['expr']) for row in rows]
+
 fig, ax = plt.subplots(figsize=(4, 2.4), dpi=200)
-ax.bar(['WT', 'dpsA', 'rpoS', 'hfq'], [120, 85, 150, 95], color='#009E73')
+ax.bar(labels, values, color='#009E73')
 ax.set_ylabel('expr fpkm')
 ax.set_xlabel('genotype')
 fig.savefig('figure.png', bbox_inches='tight')
 """
 
 BROKEN_SCRIPT = "raise RuntimeError('author environment is gone')\n"
+
+
+@pytest.fixture(autouse=True)
+def _fake_data_table(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "gaxis.repro.reconstruct._request_data",
+        lambda **kwargs: "genotype,expr\nWT,120\ndpsA,85\nrpoS,150\nhfq,95\n",
+    )
 
 
 def _setup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, with_code: bool = False):
@@ -85,6 +107,8 @@ def test_reconstruction_runs_and_records_provenance(
     stored = load_manifest(manifest.manifest_id, Path(tmp_path / "data" / "manifests"))
     assert stored is not None
     assert stored.reproduction.method == "llm_reconstruction"
+    assert stored.reproduction.data_source == "synthetic"
+    assert stored.reproduction.data_file
     assert stored.reproduction.attempts == 1
     candidate = stored.code_candidates[-1]
     assert candidate.generated is True
@@ -200,3 +224,20 @@ def test_fallback_model_is_used_when_primary_fails(
     assert result.model == "glm-4.5v"
     assert result.level in {"L1", "L2"}
     assert Path(result.code_path).is_file()
+
+
+def test_hardcoded_script_is_rejected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from gaxis.errors import GaxisError
+
+    manifest = _setup(tmp_path, monkeypatch)
+    monkeypatch.setattr("gaxis.repro.reconstruct._endpoint", _endpoint)
+    monkeypatch.setattr(
+        "gaxis.repro.reconstruct._request_code",
+        lambda **kwargs: (
+            "import matplotlib\nmatplotlib.use('Agg')\n"
+            "import matplotlib.pyplot as plt\nplt.bar([1,2],[3,4])\nplt.savefig('x.png')\n"
+        ),
+    )
+    with pytest.raises(GaxisError) as excinfo:
+        reconstruct_chart(manifest.manifest_id, engine="local", rounds=1)
+    assert excinfo.value.code == "data_not_used"

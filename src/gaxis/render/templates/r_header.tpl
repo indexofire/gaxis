@@ -30,6 +30,7 @@ SPEC <- list(
   y = @Y@,
   hue = @HUE@,
   yerr = @YERR@,
+  weight = @WEIGHT@,
   title = @TITLE@,
   xlabel = @XLABEL@,
   ylabel = @YLABEL@,

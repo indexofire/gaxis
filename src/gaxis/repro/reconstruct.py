@@ -43,9 +43,10 @@ reference image. The script is executed in an offline sandbox.
 Hard rules:
 - Only the Python standard library, matplotlib and numpy. No pandas, no network, no
   subprocess, no reading files other than the optional input table.
-- If the environment variable GAXIS_DATA is set, read that file with the csv module. Choose
-  the delimiter from the file extension (.tsv/.tab -> tab, otherwise comma); do NOT use
-  csv.Sniffer. Otherwise use the data values you infer from the image.
+- ALWAYS read the input table from the environment variable GAXIS_DATA with the csv module
+  (delimiter: tab for .tsv/.tab, otherwise comma; do NOT use csv.Sniffer). The table is provided
+  by the caller. Every plotted number must be computed from it; never hardcode data values,
+  labels or percentages. If the table is missing, fail loudly instead of inventing data.
 - Use matplotlib with matplotlib.use("Agg"), white background, and a figure size that
   matches the reference aspect ratio.
 - Save the result as "reconstruction.png" (dpi=600) and "reconstruction.pdf".
@@ -67,6 +68,22 @@ wrong place, wrong colours, wrong figure size or margins, missing error bars.
 The script must parse as valid Python: never put a literal line break inside a string
 literal (write "\\n" for a newline escape).
 Return the complete corrected script in one ```python fenced code block.
+"""
+
+
+DATA_PROMPT = """\
+Extract the tidy data needed to recreate this figure as a CSV table. It will be used to drive a
+reusable plotting script, so it must be data, not a description of the picture.
+
+Rules:
+- One header row, then one row per observation / flow / edge / category.
+- Numeric values as plain numbers (no % signs, no thousands separators).
+- If the figure has several panels, add a "panel" column and put all panels in one table.
+- Include the columns a plotting script needs (e.g. source, target, count for a Sankey;
+  cluster, node, edge_from, edge_to for a network), not just the totals visible in labels.
+- Do not invent more rows than the figure shows or implies; note uncertainty in a comment column
+  only if unavoidable.
+- Output ONLY one ```csv fenced block with the table.
 """
 
 
@@ -128,6 +145,7 @@ def _request_code(
     reference: Path,
     caption: str,
     hints: str,
+    data_contract: str = "",
     previous_code: str = "",
     rendered: Path | None = None,
     feedback: str = "",
@@ -141,6 +159,13 @@ def _request_code(
         },
         {"type": "text", "text": f"Caption:\n{caption or '(no caption)'}\n\nHints:\n{hints}"},
     ]
+    if data_contract:
+        parts.append(
+            {
+                "type": "text",
+                "text": "Input table (header + sample rows):\n```csv\n" + data_contract + "\n```",
+            }
+        )
     if previous_code:
         parts.append(
             {"type": "text", "text": "Previous script:\n```python\n" + previous_code + "\n```"}
@@ -250,6 +275,69 @@ def _normalise_code(code: str) -> str:
             return base + "\n"
         base = joined
     return base + "\n"
+
+
+def _request_data(
+    *,
+    base_url: str,
+    model: str,
+    api_key: str,
+    max_side: int,
+    timeout_s: float,
+    temperature: float,
+    max_tokens: int,
+    disable_thinking: bool,
+    reference: Path,
+    caption: str,
+    hints: str,
+) -> str:
+    parts: list[dict[str, Any]] = [
+        {"type": "text", "text": DATA_PROMPT},
+        {"type": "text", "text": "Reference figure:"},
+        {
+            "type": "image_url",
+            "image_url": {"url": f"data:image/png;base64,{_encode(reference, max_side)}"},
+        },
+        {"type": "text", "text": f"Caption:\n{caption or '(no caption)'}\n\nHints:\n{hints}"},
+    ]
+    payload: dict[str, Any] = {
+        "model": model,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "messages": [{"role": "user", "content": parts}],
+    }
+    if disable_thinking and model.startswith("glm-5"):
+        payload["thinking"] = {"type": "disabled"}
+    request = urllib.request.Request(  # noqa: S310
+        f"{base_url}/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={
+            "Content-Type": "application/json",
+            **({"Authorization": f"Bearer {api_key}"} if api_key else {}),
+        },
+    )
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_s) as response:  # noqa: S310
+                body = json.load(response)
+            content = body["choices"][0]["message"]["content"]
+            match = re.search(r"```(?:csv)?\s*\n(.*?)```", content, re.S)
+            table = (match.group(1) if match else content).strip()
+            if "," not in table or "\n" not in table:
+                raise ValueError("model returned no CSV table")
+            return table + "\n"
+        except (
+            urllib.error.URLError,
+            urllib.error.HTTPError,
+            TimeoutError,
+            ValueError,
+            KeyError,
+        ) as exc:
+            last_error = exc
+            if attempt < 2:
+                time.sleep(1.5 * (attempt + 1))
+    raise GaxisError("reconstruct_failed", f"data extraction failed: {last_error}")
 
 
 def _extract_code(content: str) -> str:
@@ -420,6 +508,29 @@ def reconstruct_manifest(
     )
     run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}-{_slug(model)}"
     base_dir = data_root / "recon" / _slug(manifest.manifest_id) / run_id
+    base_dir.mkdir(parents=True, exist_ok=True)
+    data_source = "user" if data_path is not None else "none"
+    if data_path is None and config.reconstruct.require_data:
+        csv_text = _request_data(
+            base_url=base_url,
+            model=model,
+            api_key=api_key,
+            max_side=max_side,
+            timeout_s=timeout_s,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            disable_thinking=disable_thinking,
+            reference=reference,
+            caption=manifest.caption,
+            hints=hints,
+        )
+        data_path = base_dir / "data.csv"
+        data_path.write_text(csv_text, encoding="utf-8")
+        data_source = "synthetic"
+    data_contract = ""
+    if data_path is not None and data_path.is_file():
+        lines = data_path.read_text(encoding="utf-8").splitlines()
+        data_contract = "\n".join(lines[:6])
     attempts: list[Attempt] = []
     code = repair_code
     for round_number in range(1, rounds + 1):
@@ -436,7 +547,38 @@ def reconstruct_manifest(
                 reference=reference,
                 caption=manifest.caption,
                 hints=hints,
+                data_contract=data_contract,
             )
+            if config.reconstruct.require_data and "GAXIS_DATA" not in code:
+                code = _request_code(
+                    base_url=base_url,
+                    model=model,
+                    api_key=api_key,
+                    max_side=max_side,
+                    timeout_s=timeout_s,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    disable_thinking=disable_thinking,
+                    reference=reference,
+                    caption=manifest.caption,
+                    hints=hints,
+                    data_contract=data_contract,
+                    previous_code=code,
+                    feedback=(
+                        "Your script hardcoded the data. Rewrite it to read GAXIS_DATA and "
+                        "compute every plotted value from that table; no literal data arrays "
+                        "or percentages."
+                    ),
+                )
+                if "GAXIS_DATA" not in code:
+                    raise GaxisError(
+                        "data_not_used",
+                        "model returned a script that hardcodes the data",
+                        hint=(
+                            "pass --data, or set [reconstruct] require_data = false "
+                            "for a style mock"
+                        ),
+                    )
         attempt = _run_once(
             code,
             workdir=base_dir / f"round-{round_number}",
@@ -481,6 +623,7 @@ def reconstruct_manifest(
             reference=reference,
             caption=manifest.caption,
             hints=hints,
+            data_contract=data_contract,
             previous_code=attempt.code,
             rendered=attempt.render,
             feedback=REVISE_PROMPT.format(
@@ -531,7 +674,12 @@ def reconstruct_manifest(
         else None
     )
     manifest.reproduction.environment_lock = best.image_id or best.engine
-    manifest.reproduction.data_source = "user" if data_path else "none"
+    manifest.reproduction.data_source = data_source  # type: ignore[assignment]
+    if data_path is not None and data_path.is_file():
+        try:
+            manifest.reproduction.data_file = str(data_path.relative_to(data_root))
+        except ValueError:
+            manifest.reproduction.data_file = str(data_path)
     candidate = CodeCandidate(
         code_path=str(asset_script),
         language="python",
@@ -594,6 +742,8 @@ def reconstruct_manifest(
         outputs=outputs,
         code_path=str(asset_script),
         code_sha256=code_sha,
+        data_path=str(data_path) if data_path else "",
+        data_source=data_source,
         engine=best.engine,
         model=None if unchanged else model,
         failure_reason=manifest.reproduction.failure_reason,

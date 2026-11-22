@@ -99,6 +99,9 @@ class ReconstructSettings(BaseModel):
     # Older vision models can still win on layout-heavy composites; when the primary
     # model does not reach L2, try this one and keep the better render.
     fallback_model: str = "glm-4.5v"
+    # Require the generated script to read a real/synthetic table (GAXIS_DATA); a script
+    # that hardcodes numbers only imitates pixels and is not reusable code.
+    require_data: bool = True
     max_rounds: int = Field(default=3, ge=1, le=6)
     target_similarity: float = Field(default=0.85, ge=0.0, le=1.0)
     max_side: int = Field(default=1024, ge=256, le=2048)

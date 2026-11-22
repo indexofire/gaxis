@@ -49,6 +49,9 @@ class ReproductionState(BaseModel):
     environment_lock: str | None = None
     render_output: str | None = None
     data_source: Literal["none", "user", "repo", "synthetic"] = "none"
+    data_file: str | None = Field(
+        default=None, description="table used by the generated code, relative to the data root"
+    )
     method: Literal["none", "author_code", "llm_reconstruction", "llm_repair"] = "none"
     model: str | None = None
     attempts: int = 0

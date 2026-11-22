@@ -26,6 +26,7 @@ from .acquire.repo import (
     inventory_repository,
 )
 from .adapt import adapt_script, delimiter_for
+from .analysis import list_recipes, run_amr_cooccurrence
 from .compose import collect_panels, compose_panels, page_geometry
 from .config import settings
 from .design import apply_plate_policy
@@ -39,6 +40,7 @@ from .kb.gbrain import GbrainCLI
 from .kb.ingest import IngestSummary, KbIngestor
 from .kb.names import template_slug
 from .kb.search import search_assets
+from .models.analysis import AmrCooccurrenceParams, AnalysisRun
 from .models.composition import CompositionManifest
 from .models.lint import LintReport
 from .models.manifest import FigureManifest, FigureSource, OutputFile
@@ -828,7 +830,7 @@ def render(request: RenderRequest, *, execute: bool = True) -> RenderResult:
 
 def validate(spec: ChartSpec, schema: DataSchema) -> None:
     available = [c.name for c in schema.columns]
-    for field in ("x", "y", "hue", "yerr"):
+    for field in ("x", "y", "hue", "yerr", "weight"):
         name = getattr(spec, field)
         if name and not schema.has(name):
             raise GaxisError(
@@ -840,14 +842,25 @@ def validate(spec: ChartSpec, schema: DataSchema) -> None:
         raise GaxisError(
             "missing_x", "no x column could be inferred", hint=f"available: {available}"
         )
-    for field in ("y", "yerr"):
+    for field in ("y", "yerr", "weight"):
+        if field == "y" and spec.chart_type == ChartType.network:
+            continue
         name = getattr(spec, field)
         profile = schema.column(name) if name else None
         if profile and profile.kind is not ColumnKind.numeric:
             raise GaxisError(
                 "not_numeric", f"{field} column '{name}' is {profile.kind}, not numeric"
             )
-    if spec.chart_type in (ChartType.scatter, ChartType.box, ChartType.heatmap) and not spec.y:
+    if (
+        spec.chart_type
+        in (
+            ChartType.scatter,
+            ChartType.box,
+            ChartType.heatmap,
+            ChartType.network,
+        )
+        and not spec.y
+    ):
         raise GaxisError(
             "missing_y",
             f"{spec.chart_type.value} needs a numeric y column",
@@ -1446,6 +1459,33 @@ def _template_code(page: dict[str, Any], data_root: Path) -> str | None:
             block = blocks[1]
             return block.split("\n", 1)[1] if "\n" in block else block
     return None
+
+
+def analysis_recipes() -> list[dict[str, Any]]:
+    """Available analysis recipes (table -> table); no algorithm is invented here."""
+    return list_recipes()
+
+
+def analysis_run(
+    recipe: str,
+    *,
+    input_path: Path,
+    out_dir: Path | None = None,
+    params: AmrCooccurrenceParams | None = None,
+) -> AnalysisRun:
+    """Run an analysis recipe on the user's table and write nodes/edges."""
+    if recipe != "amr-cooccurrence":
+        raise GaxisError(
+            "unknown_recipe",
+            f"unknown analysis recipe {recipe!r}",
+            hint="run `gaxis analysis list`",
+        )
+    conf = settings()
+    target = (out_dir or (conf.data_root / "analysis")).expanduser().resolve()
+    try:
+        return run_amr_cooccurrence(input_path, out_dir=target, params=params)
+    except FileNotFoundError as exc:
+        raise GaxisError("data_not_found", str(exc)) from exc
 
 
 def find_figure_manifest(identifier: str) -> FigureManifest:

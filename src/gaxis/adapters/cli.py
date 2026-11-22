@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.1) with data classes."""
+    """Print the frozen MCP tool contract (v2.2) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -694,6 +694,7 @@ def render_cmd(
     y: str | None = typer.Option(None, "--y"),
     hue: str | None = typer.Option(None, "--hue"),
     yerr: str | None = typer.Option(None, "--yerr"),
+    weight: str | None = typer.Option(None, "--weight", help="edge weight column (network)"),
     backend: str = typer.Option("python", "--backend", help="python (matplotlib) or r (ggplot2)"),
     preset: str = typer.Option("default", "--preset", "-p"),
     palette: str | None = typer.Option(None, "--palette"),
@@ -720,6 +721,7 @@ def render_cmd(
         y=y,
         hue=hue,
         yerr=yerr,
+        weight=weight,
         preset=preset,
         palette=palette,
         backend=backend,  # type: ignore[arg-type]
@@ -912,6 +914,65 @@ def adapt(
     typer.echo(result.lint.format_text())
 
 
+analysis_app = typer.Typer(help="Analysis recipes: table -> table steps for figures")
+app.add_typer(analysis_app, name="analysis")
+
+
+@analysis_app.command("list")
+def analysis_list(as_json: bool = typer.Option(False, "--json")) -> None:
+    """List analysis recipes (input contract, outputs, provenance)."""
+    recipes = service.analysis_recipes()
+    if as_json:
+        _echo_json(recipes)
+        return
+    for recipe in recipes:
+        typer.echo(f"{recipe['id']}: {recipe['title']}")
+        typer.echo(f"  input:   {recipe['input']}")
+        typer.echo(f"  outputs: {', '.join(recipe['outputs'])}")
+        typer.echo(f"  note:    {recipe['note']}")
+
+
+@analysis_app.command("run")
+def analysis_run_cmd(
+    recipe: str = typer.Argument(..., help="recipe id, e.g. amr-cooccurrence"),
+    input: Path = typer.Option(..., "--input", "-i", help="long table: sample,gene[,gene_class]"),
+    out: Path | None = typer.Option(None, "--out"),
+    min_prevalence: float = typer.Option(0.05, "--min-prevalence"),
+    min_support: int = typer.Option(2, "--min-support"),
+    weight: str = typer.Option("jaccard", "--weight", help="jaccard | count"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """Run an analysis recipe on a user table (no bioinformatics re-computation)."""
+    from ..models.analysis import AmrCooccurrenceParams
+
+    try:
+        run = service.analysis_run(
+            recipe,
+            input_path=input,
+            out_dir=out,
+            params=AmrCooccurrenceParams(
+                min_prevalence=min_prevalence,
+                min_support=min_support,
+                weight=weight,  # type: ignore[arg-type]
+            ),
+        )
+    except GaxisError as exc:
+        _fail(exc)
+        return
+    if as_json:
+        _echo_json(json.loads(run.model_dump_json()))
+        return
+    typer.echo(f"run:     {run.run_id}")
+    typer.echo(f"recipe:  {run.recipe}")
+    typer.echo(f"samples: {run.samples}   genes: {run.genes}   edges: {run.edges}")
+    typer.echo(f"nodes:   {run.outputs['nodes']}")
+    typer.echo(f"edges:   {run.outputs['edges']}")
+    typer.echo(
+        "next:    gaxis render --chart network --data "
+        f"{run.outputs['edges']} --x source --y target --weight weight"
+    )
+
+
 @app.command("reconstruct")
 def reconstruct_cmd(
     manifest_id: str = typer.Argument(..., help="paper figure manifest id"),
@@ -955,6 +1016,8 @@ def reconstruct_cmd(
         history = ", ".join(f"{value:.3f}" for value in result.similarity_history)
         typer.echo(f"similarity: {result.visual_similarity:.3f}   history: [{history}]")
     typer.echo(f"code:     {result.code_path}")
+    if result.data_path:
+        typer.echo(f"data:     {result.data_path} ({result.data_source})")
     if result.failure_reason:
         typer.echo(f"note:     {result.failure_reason}")
     if result.kb_refresh:

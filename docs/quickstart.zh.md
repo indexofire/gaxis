@@ -70,7 +70,7 @@ pixi run gaxis render --data examples/demo/expr.tsv \
   --chart line --x time_h --y od600 --hue genotype --preset isme
 ```
 
-6 种图型：`bar`、`stacked_bar`、`line`、`scatter`、`box`、`heatmap`。
+7 种图型：`bar`、`stacked_bar`、`line`、`scatter`、`box`、`heatmap`、`network`。
 7 个预设见[期刊预设](presets.zh.md)。
 
 ## 5. 检查交付质量

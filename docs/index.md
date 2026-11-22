@@ -17,7 +17,7 @@ The core principle is a single sentence:
 
 ## What it can do
 
-- **Figures**: 6 figure types × matplotlib / ggplot2 dual backends × 7 microbiology journal presets, PDF/SVG/PNG/TIFF, item-by-item publication-grade lint (L001–L009).
+- **Figures**: 7 figure types (including network) × matplotlib / ggplot2 dual backends × 7 microbiology journal presets, PDF/SVG/PNG/TIFF, item-by-item publication-grade lint (L001–L009).
 - **Deliverable code**: every figure ships with a standalone `figure.py` / `figure.R` that does not import gaxis and runs in any Python/R environment.
 - **Evidence binding**: every render writes a `manifest.json` containing the data hash, code hash, output geometry, and lint report.
 - **Figure selection**: give a one-sentence requirement, or just a data table, and it retrieves candidate figures from the knowledge base, generates a numbered contact sheet, then renders the one you pick.

@@ -70,7 +70,7 @@ pixi run gaxis render --data examples/demo/expr.tsv \
   --chart line --x time_h --y od600 --hue genotype --preset isme
 ```
 
-6 chart types: `bar`, `stacked_bar`, `line`, `scatter`, `box`, `heatmap`.
+7 chart types: `bar`, `stacked_bar`, `line`, `scatter`, `box`, `heatmap`, `network`.
 See [journal presets](presets.md) for the 7 presets.
 
 ## 5. Checking Deliverable Quality

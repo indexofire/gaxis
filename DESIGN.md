@@ -390,7 +390,7 @@ can never write into a developer's real brain.
 
 | Phase | Deliverable | Status | Acceptance (plan §8) |
 |---|---|---|---|
-| **M0** | deterministic render pipeline + lint + manifest + CLI + MCP server/client/adapter | **done**: 6 chart types × 2 backends × 7 presets lint-clean; contract v2.1 frozen | 36/36 lint-clean; review accepted |
+| **M0** | deterministic render pipeline + lint + manifest + CLI + MCP server/client/adapter | **done**: 7 chart types × 2 backends × 7 presets lint-clean; contract v2.2 frozen | 36/36 lint-clean; review accepted |
 | **M1** | paper acquisition, figure/caption/code extraction, `ChartReproManifest` | **done**: identifiers, bounded download, repo discovery, manifests | completeness/pairing measured per corpus, not yet a single number |
 | **M2** | podman sandbox, comparison, L1/L2/L3 | **done**: rootless podman, similarity decomposition, code assetisation | success/agreement depend on paper code availability |
 | **M3** | asset store, gbrain `paper-kb`, retrieval | **done**: pages, embeddings, text/schema/image retrieval | Top-5 measured by the owner on real queries |

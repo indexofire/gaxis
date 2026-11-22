@@ -1,0 +1,6 @@
+source,target,weight,support,jaccard
+blaCTX-M,blaTEM,0.62,12,0.62
+blaCTX-M,sul1,0.41,8,0.41
+blaTEM,sul1,0.35,7,0.35
+sul1,tetA,0.28,5,0.28
+blaCTX-M,tetA,0.22,4,0.22

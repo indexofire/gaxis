@@ -21,7 +21,7 @@ Two surfaces over one core:
 **0.1.0** — the core loop works end to end:
 
 - deterministic pipeline: data → spec → standalone script → figure → publication lint (L001–L009)
-  → `manifest.json` with data/code hashes; six chart types × matplotlib/ggplot2 × seven presets;
+  → `manifest.json` with data/code hashes; seven chart types × matplotlib/ggplot2 × seven presets;
 - paper side: identifier resolution, bounded PDF download, figure/caption/citing-paragraph
   extraction, repository link + plotting-script discovery;
 - reproduction: rootless podman sandbox, similarity decomposition, L1/L2/L3, code assetisation;
@@ -29,6 +29,8 @@ Two surfaces over one core:
   templates (`kb seed`), paper-script adoption (`kb adopt`);
 - selection & adaptation: `plan_chart_from_brief`, candidate contact sheets, `adapt_chart_code`,
   multi-panel `compose` (with `--uniform`);
+- analysis recipes on bacmap tables: `gaxis analysis run amr-cooccurrence` computes gene
+  co-occurrence (no AMR re-calling) and `--chart network` renders it in both backends;
 - operations: checkpointed ingest/reproduce queue, retries, stall reclaim, heartbeat, `ops verify`;
 - surfaces: CLI and MCP server (ten tools, contract v2.1) + typed client + bacmap adapter.
 

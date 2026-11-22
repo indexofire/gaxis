@@ -125,6 +125,7 @@ max_side = 768
 | `disable_thinking` | `true` | 否则 GLM-5 会把 token 预算花在隐藏推理上 |
 | `max_tokens` | `8000` | 单次生成长度上限 |
 | `fallback_model` | `glm-4.5v` | 仅当主模型低于 L2 时重试，保留更好的渲染 |
+| `require_data` | `true` | 生成的代码必须读 `GAXIS_DATA`；硬编码脚本会被拒绝（`data_not_used`） |
 
 ## `[sandbox]` — 复现隔离
 

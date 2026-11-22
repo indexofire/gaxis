@@ -93,6 +93,7 @@ plugins:
             Multi-panel composition: 多面板拼版
             Queue and self-healing: 运维：队列、定时与自愈
             LLM reconstruction: LLM 重建
+            AMR co-occurrence network: AMR 共现网络
 
 markdown_extensions:
   - admonition
@@ -138,6 +139,7 @@ nav:
       - Multi-panel composition: tutorial/05-compose-panels.md
       - Queue and self-healing: tutorial/06-operations.md
       - LLM reconstruction: tutorial/07-llm-reconstruction.md
+      - AMR co-occurrence network: tutorial/08-amr-network.md
   - Reference:
       - CLI: reference/cli.md
       - Configuration: reference/configuration.md

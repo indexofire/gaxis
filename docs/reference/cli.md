@@ -96,6 +96,16 @@ View the full manifest of a paper figure by id (code candidates, reproduction le
 
 Single-figure reproduction → grading → automatic assetization + KB refresh.
 
+### `gaxis analysis list` / `gaxis analysis run`
+
+| Command | Meaning |
+|---|---|
+| `gaxis analysis list [--json]` | available analysis recipes, input contract, outputs |
+| `gaxis analysis run amr-cooccurrence --input TABLE [--out DIR] [--min-prevalence F] [--min-support N] [--weight jaccard\|count]` | table → `nodes.csv` + `edges.csv` + `analysis.json` |
+
+The AMR recipe consumes gene calls that already exist (bacmap/ABRicate). It does not run
+AMR calling. Render the result with `--chart network --x source --y target --weight weight`.
+
 ### `gaxis reconstruct MANIFEST_ID [options]`
 
 | Option | Meaning |

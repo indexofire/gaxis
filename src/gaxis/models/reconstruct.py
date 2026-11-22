@@ -17,6 +17,8 @@ class ReconstructResult(BaseModel):
     outputs: list[OutputFile] = Field(default_factory=list)
     code_path: str = ""
     code_sha256: str = ""
+    data_path: str = ""
+    data_source: str = "none"
     engine: str = "none"
     model: str | None = None
     failure_reason: str = ""

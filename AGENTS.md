@@ -113,6 +113,8 @@ pixi run gaxis reproduce-paper pdf-<sha8> [--data table.csv] [--synthetic] [--re
 pixi run gaxis reconstruct pdf-<sha8>/fig-1 [--data table.csv] [--repair]
 pixi run gaxis kb seed                     # verified builtin templates -> KB (idempotent)
 pixi run gaxis kb adopt pdf-<sha8>/fig-1   # reproduced paper script -> adaptable template
+pixi run gaxis analysis run amr-cooccurrence --input amr.csv --out data/analysis
+pixi run gaxis render --chart network --data edges.csv --x source --y target --weight weight
 pixi run gaxis adapt --data data.tsv --preset asm --query "bar chart"
 pixi run gaxis quality sheet            # human-ranking sheet for score calibration
 pixi run gaxis quality backfill        # recompute crop_clean + scores, then re-ingest
@@ -148,6 +150,7 @@ src/gaxis/
   adapt.py    KB template -> local data: verified constant rebinding
   (kb/adopt.py) reproduced paper script -> template (DATA_PATH contract)
   compose.py  multi-panel page composition (vector, PyMuPDF)
+  analysis/    table -> table recipes (AMR co-occurrence; no bioinformatics re-calling)
   ops/        checkpointed queue (SQLite): ingest + reproduce jobs
   repro/batch.py  reproduce a paper's suitable figures (explicit needs_data/needs_env)
   repro/synthetic.py  labelled synthetic input when the paper's data is absent

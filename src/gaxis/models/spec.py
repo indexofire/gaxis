@@ -22,6 +22,7 @@ class ChartType(StrEnum):
     scatter = "scatter"
     box = "box"
     heatmap = "heatmap"
+    network = "network"
 
 
 class ChartSpec(BaseModel):
@@ -34,6 +35,7 @@ class ChartSpec(BaseModel):
     y: str | None = None
     hue: str | None = None
     yerr: str | None = None
+    weight: str | None = None
     title: str | None = None
     xlabel: str | None = None
     ylabel: str | None = None

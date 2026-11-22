@@ -1,6 +1,6 @@
 # Tutorials
 
-The six tutorials map to gaxis's two main workflows and three supporting capabilities. Each one can be run independently, but doing them in order works best.
+The tutorials map to gaxis's two main workflows, the analysis-recipe bridge, and supporting capabilities. Each one can be run independently, but doing them in order works best.
 
 | Section | What you get | Needs network | Needs KB |
 |---|---|---|---|
@@ -10,12 +10,14 @@ The six tutorials map to gaxis's two main workflows and three supporting capabil
 | [04 Paper reproduction → code onboarding](04-reproduce-paper.md) | L1/L2/L3 ratings, code assets, searchable pages | Yes | Yes |
 | [05 Multi-panel composition](05-compose-panels.md) | One-page vector multi-panel figure + composite manifest | No | No |
 | [06 Operations](06-operations.md) | Automated onboarding queue, scheduled tasks, self-healing checks | Yes | Yes |
+| [07 LLM reconstruction](07-llm-reconstruction.md) | Figure code when author code is missing or broken (labelled `llm_*`) | Yes | No |
+| [08 AMR co-occurrence network](08-amr-network.md) | Table → co-occurrence edges → network figure, no AMR re-calling | No | No |
 
 ## Recommended practice order
 
 ```text
-01 ──► 02 ──► 03 ──► 05          (fully offline: build intuition first)
-          └──► 04 ──► 06          (do these with a real paper)
+01 ──► 02 ──► 03 ──► 05 ──► 08   (fully offline: build intuition first)
+          └──► 04 ──► 06 ──► 07   (do these with a real paper)
 ```
 
 ## Structure shared by every section

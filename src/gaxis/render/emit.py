@@ -19,7 +19,7 @@ from ..style.palettes import get_palette
 from ..style.presets import Preset
 from ..style.rc import build_rc, resolve_font, size_inches
 
-SUPPORTED_CHARTS = ("bar", "stacked_bar", "line", "scatter", "box", "heatmap")
+SUPPORTED_CHARTS = ("bar", "stacked_bar", "line", "scatter", "box", "heatmap", "network")
 
 
 def _template(name: str) -> str:
@@ -104,6 +104,7 @@ def emit_code(
                         "y": spec.y,
                         "hue": spec.hue,
                         "yerr": spec.yerr,
+                        "weight": spec.weight,
                         "title": spec.title,
                         "xlabel": spec.xlabel,
                         "ylabel": spec.ylabel,
@@ -131,6 +132,7 @@ def emit_code(
             "@Y@": _r(spec.y),
             "@HUE@": _r(spec.hue),
             "@YERR@": _r(spec.yerr),
+            "@WEIGHT@": _r(spec.weight),
             "@TITLE@": _r(spec.title),
             "@XLABEL@": _r(spec.xlabel),
             "@YLABEL@": _r(spec.ylabel),
