@@ -86,8 +86,71 @@ class RepoInventory:
     error: str = ""
 
 
+_URL_TAIL = re.compile(r"https?://\S*$")
+_URL_CONTINUATION = re.compile(r"^[A-Za-z0-9/._~%?#&=+@:-]+$")
+
+
+def repair_wrapped_urls(text: str) -> str:
+    """Join URLs broken across PDF lines (``github.\ncom/owner/repo``).
+
+    PDF extraction wraps long URLs at arbitrary characters. Only single-token
+    continuations are joined (no spaces), and only while the current line is an open URL.
+    """
+    lines = text.splitlines()
+    merged: list[str] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        joins = 0
+        while _URL_TAIL.search(line) and index + 1 < len(lines) and joins < 6:
+            following = lines[index + 1].strip()
+            if not following or not _URL_CONTINUATION.match(following):
+                break
+            first = following[0]
+            if not (first.islower() or first.isdigit() or first in "/._-?=&#%+"):
+                break
+            line = line.rstrip() + following
+            index += 1
+            joins += 1
+        merged.append(line)
+        index += 1
+    return _join_url_tokens("\n".join(merged))
+
+
+def _continues_url(current: str, following: str) -> bool:
+    if not _URL_CONTINUATION.match(following):
+        return False
+    if following.endswith(":") or following.endswith(";"):
+        return False
+    if following[0].isupper():
+        return False
+    # a URL fragment ends on these characters; the space was a PDF line break
+    return bool(re.search(r"(?:[/._-]|//)$", current))
+
+
+def _join_url_tokens(text: str) -> str:
+    """Join space-separated fragments of the same URL (PDFs break at spaces too)."""
+    tokens = text.split()
+    merged: list[str] = []
+    index = 0
+    while index < len(tokens):
+        token = tokens[index]
+        if token.startswith(("http://", "https://")):
+            joins = 0
+            while (
+                index + 1 < len(tokens) and joins < 8 and _continues_url(token, tokens[index + 1])
+            ):
+                token = token + tokens[index + 1]
+                index += 1
+                joins += 1
+        merged.append(token)
+        index += 1
+    return " ".join(merged)
+
+
 def find_repository_urls(text: str, *, limit: int = 8) -> list[RepoLink]:
     found: dict[str, RepoLink] = {}
+    text = repair_wrapped_urls(text or "")
     for host, pattern in REPO_PATTERNS:
         for match in pattern.finditer(text or ""):
             if host == "zenodo":

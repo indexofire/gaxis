@@ -20,6 +20,12 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   newlines inside string literals). Each run is timestamped (`data/recon/<fig>/<run-id>/`) with
   per-round `attempt.json`, a run-level `reconstruction.json`, and no cross-run overwrites.
 
+### Fixed
+
+- Repository discovery from PDFs: URLs wrapped across lines or split at spaces
+  (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
+  code discovery too (it previously only ran for DOI/URL sources).
+
 ## [0.1.0] — 2026-11-21
 
 First working line: extraction + reproduction + knowledge base + design judge.

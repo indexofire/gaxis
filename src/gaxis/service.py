@@ -524,6 +524,19 @@ def ingest_paper(request: IngestPaperRequest) -> IngestPaperResult:
                 f"cannot parse {path.name}: {exc}",
                 hint="encrypted, corrupt, or not actually a PDF",
             ) from exc
+        repository_urls = [link.url for link in find_repository_urls(parsed.full_text)]
+        wants_code = request.with_code if request.with_code is not None else cfg.with_code
+        code_candidates = 0
+        if wants_code and repository_urls and mode == "full":
+            code_candidates = _attach_repository_code(
+                repository_urls,
+                manifests,
+                manifests_dir=conf.manifests_dir,
+                data_root=conf.data_root,
+                timeout_s=cfg.repo_timeout_s,
+                max_repos=cfg.max_repos,
+                notes=[],
+            )
         briefs = [
             FigureBrief(
                 figure_ref=figure.figure_ref,
@@ -556,6 +569,8 @@ def ingest_paper(request: IngestPaperRequest) -> IngestPaperResult:
             paper_id=record.paper_id,
             title=record.title,
             doi=record.doi,
+            repository_urls=repository_urls,
+            code_candidate_count=code_candidates,
             figure_briefs=briefs,
             matches=[],
             manifest_ids=[m.manifest_id for m in manifests] if mode == "full" else [],

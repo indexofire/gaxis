@@ -33,3 +33,16 @@ def test_trailing_punctuation_does_not_leak_into_the_url() -> None:
 
 def test_plain_text_without_links_returns_empty() -> None:
     assert find_repository_urls("no repositories here, only prose") == []
+
+
+def test_wrapped_urls_from_pdf_text_are_joined() -> None:
+    text = (
+        "Analysis scripts and data are available at https://github.\n"
+        "com/SCAUJunhaoPeng/Epidemiological-Investigation-of-Salmonella-in-\n"
+        "the-Pork-Supply-chain.\nReceived: 10 March 2026"
+    )
+    links = find_repository_urls(text)
+    assert [link.url for link in links] == [
+        "https://github.com/SCAUJunhaoPeng/Epidemiological-Investigation-of-Salmonella-in-the-Pork-Supply-chain"
+    ]
+    assert links[0].owner == "SCAUJunhaoPeng"
