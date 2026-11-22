@@ -46,6 +46,23 @@ results/iqtree.log
 - `metadata` is optional and reserved for tree annotation in the next step.
 - bacmap can schedule the same Snakefile; gaxis is not in the execution path.
 
+## Render the tree
+
+```bash
+pixi run gaxis analysis run newick-to-table \
+  --input results/tree.nwk --out data/analysis
+
+pixi run gaxis render \
+  --data data/analysis/<run_id>/tree_edges.csv \
+  --chart tree --x parent --y child --weight branch_length \
+  --preset asm --out data/figures
+```
+
+Rectangular cladogram, branch lengths from `branch_length`, tip labels; matplotlib and
+ggplot2 both render it. The tree itself still comes from IQ-TREE, not gaxis.
+
+![Tree example](/gaxis/assets/example-tree.png)
+
 ## Validate another checkout
 
 ```bash
@@ -69,5 +86,5 @@ pixi run gaxis analysis check workflows/snp-tree
 
 ## Next
 
-Tree rendering (`tree.nwk` → publication tree with tip metadata) is the next step; the workflow
-output is already the stable contract.
+Tree annotation (AMR class / source / type colour bands next to the tips) is the next step; the
+tree layout and workflow output are already stable contracts.

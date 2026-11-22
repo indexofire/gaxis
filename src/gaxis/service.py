@@ -31,6 +31,7 @@ from .analysis import (
     list_recipes,
     list_workflows,
     run_amr_cooccurrence,
+    run_newick_to_table,
     scaffold_snp_tree,
 )
 from .compose import collect_panels, compose_panels, page_geometry
@@ -850,7 +851,7 @@ def validate(spec: ChartSpec, schema: DataSchema) -> None:
             "missing_x", "no x column could be inferred", hint=f"available: {available}"
         )
     for field in ("y", "yerr", "weight"):
-        if field == "y" and spec.chart_type == ChartType.network:
+        if field == "y" and spec.chart_type in (ChartType.network, ChartType.tree):
             continue
         name = getattr(spec, field)
         profile = schema.column(name) if name else None
@@ -1519,14 +1520,16 @@ def analysis_run(
     params: AmrCooccurrenceParams | None = None,
 ) -> AnalysisRun:
     """Run an analysis recipe on the user's table and write nodes/edges."""
+    conf = settings()
+    target = (out_dir or (conf.data_root / "analysis")).expanduser().resolve()
+    if recipe == "newick-to-table":
+        return run_newick_to_table(input_path, out_dir=target)
     if recipe != "amr-cooccurrence":
         raise GaxisError(
             "unknown_recipe",
             f"unknown analysis recipe {recipe!r}",
             hint="run `gaxis analysis list`",
         )
-    conf = settings()
-    target = (out_dir or (conf.data_root / "analysis")).expanduser().resolve()
     try:
         return run_amr_cooccurrence(input_path, out_dir=target, params=params)
     except FileNotFoundError as exc:

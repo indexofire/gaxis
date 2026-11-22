@@ -360,6 +360,7 @@ rather than being rasterised silently; too-small layouts raise `bad_layout`.
 | v1.5 | M1 completion | identifier resolution (Crossref/arXiv/PubMed/PMC/Unpaywall), PDF download, repository link + plotting-script discovery; ingest result gains `pdf_url`, `repository_urls`, `code_candidate_count`, request gains `with_code` |
 | v1.7 | design tiering | `ChartAssetSummary` gains `design_score` and `design_tier` (gold/dense/reject) |
 | v1.8 | usefulness | `ChartAssetSummary` gains `usefulness_score`; retrieval ranks by design × usefulness |
+| v2.3 | tree chart | `ChartType` gains `tree` (Newick edges → rectangular cladogram, both backends) |
 | v2.2 | network chart | `render_chart_from_data` gains `weight`; `ChartType` gains `network` (circular edge layout, both backends) |
 | v2.1 | schema search + batch | `search_chart_assets` accepts `schema_path`, `design_tier`, `has_code`, `dedupe`, `render_sheet` (returns `sheet_path`); `ChartAssetSummary.has_code`; `ReproduceChartCodeResult` reports KB refresh in `sandbox_report.kb_refresh`; `RenderRequest.source_asset` records selection feedback |
 | v2.0 | perceptual + uniform | `search_chart_assets` gains optional `query_image_path` and `image_similarity` (dHash ranking); `compose_panels` gains `uniform` (re-render panels at the composition preset) |

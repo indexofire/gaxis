@@ -172,7 +172,7 @@ def run_amr_cooccurrence(
         recipe="amr-cooccurrence",
         input_path=str(input_path),
         input_sha256=digest,
-        params=params,
+        params=params.model_dump(),
         samples=len(samples),
         genes=len(genes),
         edges=len(edges),

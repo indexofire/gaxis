@@ -24,8 +24,8 @@ Profile a table: column types, cardinality, unit hints, recommended chart types.
 
 | Option | Description |
 |---|---|
-| `--chart {bar,stacked_bar,line,scatter,box,heatmap}` | Chart type (inferred from data by default) |
-| `--x/--y/--hue/--yerr` | Encoded column names |
+| `--chart {bar,stacked_bar,line,scatter,box,heatmap,network,tree}` | Chart type (inferred; network/tree must be explicit) |
+| `--x/--y/--hue/--yerr/--weight` | Encoded column names (network: source/target/weight; tree: parent/child/branch) |
 | `--backend python\|r` | matplotlib or ggplot2 |
 | `--preset NAME` | Journal preset (default `default`) |
 | `--palette NAME` | Override the preset palette |
@@ -102,6 +102,7 @@ Single-figure reproduction → grading → automatic assetization + KB refresh.
 |---|---|
 | `gaxis analysis list [--json]` | available analysis recipes, input contract, outputs |
 | `gaxis analysis run amr-cooccurrence --input TABLE [--out DIR] [--min-prevalence F] [--min-support N] [--weight jaccard\|count]` | table → `nodes.csv` + `edges.csv` + `analysis.json` |
+| `gaxis analysis run newick-to-table --input tree.nwk [--out DIR]` | Newick → `tree_edges.csv` (parent, child, branch_length) |
 | `gaxis analysis workflows` | list Snakemake workflow recipes |
 | `gaxis analysis scaffold snp-tree --out DIR --alignment FASTA [--container IMAGE] [--check]` | generate a validated IQ-TREE workflow project |
 | `gaxis analysis check DIR` | validate an existing workflow with `snakemake -n` |

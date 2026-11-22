@@ -24,8 +24,8 @@
 
 | 选项 | 说明 |
 |---|---|
-| `--chart {bar,stacked_bar,line,scatter,box,heatmap,network}` | 图型（默认由数据推断；network 需显式指定） |
-| `--x/--y/--hue/--yerr/--weight` | 编码列名（network 用 source/target/weight） |
+| `--chart {bar,stacked_bar,line,scatter,box,heatmap,network,tree}` | 图型（默认由数据推断；network/tree 需显式指定） |
+| `--x/--y/--hue/--yerr/--weight` | 编码列名（network：source/target/weight；tree：parent/child/branch） |
 | `--backend python\|r` | matplotlib 或 ggplot2 |
 | `--preset NAME` | 期刊预设（默认 `default`） |
 | `--palette NAME` | 覆盖预设调色板 |
@@ -102,6 +102,7 @@
 |---|---|
 | `gaxis analysis list [--json]` | 可用分析 recipe、输入契约、输出 |
 | `gaxis analysis run amr-cooccurrence --input TABLE [--out DIR] [--min-prevalence F] [--min-support N] [--weight jaccard\|count]` | 表 → `nodes.csv` + `edges.csv` + `analysis.json` |
+| `gaxis analysis run newick-to-table --input tree.nwk [--out DIR]` | Newick → `tree_edges.csv`（parent、child、branch_length） |
 | `gaxis analysis workflows` | 列出 Snakemake 工作流 recipe |
 | `gaxis analysis scaffold snp-tree --out DIR --alignment FASTA [--container IMAGE] [--check]` | 生成并校验 IQ-TREE 工作流项目 |
 | `gaxis analysis check DIR` | 用 `snakemake -n` 校验已有工作流 |

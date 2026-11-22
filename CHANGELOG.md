@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Tree chart + Newick conversion**: `gaxis analysis run newick-to-table` converts a Newick tree to
+  a parent/child/branch table; `gaxis render --chart tree --x parent --y child --weight branch_length`
+  draws a rectangular cladogram in both backends. Contract v2.3. The tree still comes from IQ-TREE.
 - **SNP-tree workflow recipe**: `gaxis analysis scaffold snp-tree` writes a Snakemake project
   (Snakefile, config, README, `workflow.json` with file hashes) and `gaxis analysis check` validates
   it with `snakemake -n`. gaxis does not run IQ-TREE; bacmap or the user executes the workflow and

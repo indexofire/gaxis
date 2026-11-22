@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -22,7 +22,7 @@ class AnalysisRun(BaseModel):
     version: str = "amr-cooccurrence-v1"
     input_path: str
     input_sha256: str
-    params: AmrCooccurrenceParams
+    params: dict[str, Any]
     samples: int
     genes: int
     edges: int

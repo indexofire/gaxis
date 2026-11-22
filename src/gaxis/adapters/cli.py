@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.2) with data classes."""
+    """Print the frozen MCP tool contract (v2.3) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -1039,12 +1039,18 @@ def analysis_run_cmd(
     typer.echo(f"run:     {run.run_id}")
     typer.echo(f"recipe:  {run.recipe}")
     typer.echo(f"samples: {run.samples}   genes: {run.genes}   edges: {run.edges}")
-    typer.echo(f"nodes:   {run.outputs['nodes']}")
-    typer.echo(f"edges:   {run.outputs['edges']}")
-    typer.echo(
-        "next:    gaxis render --chart network --data "
-        f"{run.outputs['edges']} --x source --y target --weight weight"
-    )
+    for name, path in run.outputs.items():
+        typer.echo(f"{name + ':':<9}{path}")
+    if run.recipe == "amr-cooccurrence":
+        typer.echo(
+            "next:    gaxis render --chart network --data "
+            f"{run.outputs['edges']} --x source --y target --weight weight"
+        )
+    elif run.recipe == "newick-to-table":
+        typer.echo(
+            "next:    gaxis render --chart tree --data "
+            f"{run.outputs['tree_edges']} --x parent --y child --weight branch_length"
+        )
 
 
 @app.command("reconstruct")

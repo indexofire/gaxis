@@ -23,6 +23,7 @@ class ChartType(StrEnum):
     box = "box"
     heatmap = "heatmap"
     network = "network"
+    tree = "tree"
 
 
 class ChartSpec(BaseModel):

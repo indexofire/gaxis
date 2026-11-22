@@ -45,6 +45,23 @@ results/iqtree.log
 - `metadata` 可选，留给下一步的树注释。
 - bacmap 可以调度同一个 Snakefile；gaxis 不在执行路径里。
 
+## 渲染树
+
+```bash
+pixi run gaxis analysis run newick-to-table \
+  --input results/tree.nwk --out data/analysis
+
+pixi run gaxis render \
+  --data data/analysis/<run_id>/tree_edges.csv \
+  --chart tree --x parent --y child --weight branch_length \
+  --preset asm --out data/figures
+```
+
+矩形进化树；分支长度来自 `branch_length`，tip 标签自动放置；matplotlib 与 ggplot2 双后端。
+树本身仍由 IQ-TREE 生成，gaxis 只做布局与出图。
+
+![树图示例](/gaxis/assets/example-tree.png)
+
 ## 校验已有项目
 
 ```bash
@@ -68,4 +85,4 @@ pixi run gaxis analysis check workflows/snp-tree
 
 ## 下一步
 
-树渲染（`tree.nwk` → 带 tip metadata 的发表级树图）是下一步；工作流输出已经是稳定契约。
+树注释（AMR 类别 / 来源 / 型别色带贴在 tip 旁）是下一步；树布局与工作流输出已经是稳定契约。

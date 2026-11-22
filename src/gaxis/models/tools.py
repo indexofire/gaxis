@@ -1,4 +1,4 @@
-"""MCP tool contract v2.2 — frozen surface between the kernel and every host.
+"""MCP tool contract v2.3 — frozen surface between the kernel and every host.
 
 Seven tools, one core. Hosts (bacmap, DSH, Pi, Hermes, CLI) only translate; the
 kernel never learns about a host SDK (ADR-05). Every tool declares its data

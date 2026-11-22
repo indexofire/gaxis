@@ -1,5 +1,5 @@
 {
-  "contract_version": "v2.2",
+  "contract_version": "v2.3",
   "tools": {
     "adapt_chart_code": {
       "data_class": "D3",

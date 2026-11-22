@@ -11,7 +11,7 @@
 | [05 多面板拼版](05-compose-panels.zh.md) | 一页矢量多面板图 + 合成 manifest | 否 | 否 |
 | [06 运维](06-operations.zh.md) | 自动入库队列、定时任务、自愈检查 | 是 | 是 |
 | [08 AMR 共现网络](08-amr-network.zh.md) | 表 → 共现边 → 画网络图，不重跑 AMR | 否 | 否 |
-| [09 SNP 树工作流](09-snp-tree-workflow.zh.md) | IQ-TREE 的 Snakemake 脚手架与校验，由 bacmap 执行 | 否 | 否 |
+| [09 SNP 树工作流](09-snp-tree-workflow.zh.md) | IQ-TREE 的 Snakemake 脚手架与校验，再由 gaxis 出树图 | 否 | 否 |
 
 ## 建议的练习顺序
 

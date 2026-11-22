@@ -94,8 +94,16 @@ def infer_spec(
         yerr=yerr,
         weight=weight,
         title=title,
-        xlabel=xlabel if xlabel is not None else (humanize(x_col) if x_col else None),
-        ylabel=ylabel if ylabel is not None else (humanize(y_col) if y_col else "count"),
+        xlabel=(
+            None
+            if chart is ChartType.tree
+            else (xlabel if xlabel is not None else (humanize(x_col) if x_col else None))
+        ),
+        ylabel=(
+            None
+            if chart is ChartType.tree
+            else (ylabel if ylabel is not None else (humanize(y_col) if y_col else "count"))
+        ),
         preset=preset,
         palette=palette,
         backend=backend,  # type: ignore[arg-type]

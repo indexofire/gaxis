@@ -19,7 +19,16 @@ from ..style.palettes import get_palette
 from ..style.presets import Preset
 from ..style.rc import build_rc, resolve_font, size_inches
 
-SUPPORTED_CHARTS = ("bar", "stacked_bar", "line", "scatter", "box", "heatmap", "network")
+SUPPORTED_CHARTS = (
+    "bar",
+    "stacked_bar",
+    "line",
+    "scatter",
+    "box",
+    "heatmap",
+    "network",
+    "tree",
+)
 
 
 def _template(name: str) -> str:

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from gaxis.models.tools import TOOL_SPECS
 
-CONTRACT_VERSION = "v2.2"
+CONTRACT_VERSION = "v2.3"
 
 snapshot = {
     "contract_version": CONTRACT_VERSION,

@@ -116,6 +116,8 @@ pixi run gaxis kb adopt pdf-<sha8>/fig-1   # reproduced paper script -> adaptabl
 pixi run gaxis analysis run amr-cooccurrence --input amr.csv --out data/analysis
 pixi run gaxis render --chart network --data edges.csv --x source --y target --weight weight
 pixi run gaxis analysis scaffold snp-tree --out workflows/snp-tree --alignment aln.fasta --check
+pixi run gaxis analysis run newick-to-table --input tree.nwk --out data/analysis
+pixi run gaxis render --chart tree --data tree_edges.csv --x parent --y child --weight branch_length
 pixi run gaxis adapt --data data.tsv --preset asm --query "bar chart"
 pixi run gaxis quality sheet            # human-ranking sheet for score calibration
 pixi run gaxis quality backfill        # recompute crop_clean + scores, then re-ingest

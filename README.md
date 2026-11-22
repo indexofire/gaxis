@@ -21,7 +21,7 @@ Two surfaces over one core:
 **0.1.0** — the core loop works end to end:
 
 - deterministic pipeline: data → spec → standalone script → figure → publication lint (L001–L009)
-  → `manifest.json` with data/code hashes; seven chart types × matplotlib/ggplot2 × seven presets;
+  → `manifest.json` with data/code hashes; eight chart types × matplotlib/ggplot2 × seven presets;
 - paper side: identifier resolution, bounded PDF download, figure/caption/citing-paragraph
   extraction, repository link + plotting-script discovery;
 - reproduction: rootless podman sandbox, similarity decomposition, L1/L2/L3, code assetisation;
