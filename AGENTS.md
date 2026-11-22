@@ -115,6 +115,7 @@ pixi run gaxis kb seed                     # verified builtin templates -> KB (i
 pixi run gaxis kb adopt pdf-<sha8>/fig-1   # reproduced paper script -> adaptable template
 pixi run gaxis analysis run amr-cooccurrence --input amr.csv --out data/analysis
 pixi run gaxis render --chart network --data edges.csv --x source --y target --weight weight
+pixi run gaxis analysis scaffold snp-tree --out workflows/snp-tree --alignment aln.fasta --check
 pixi run gaxis adapt --data data.tsv --preset asm --query "bar chart"
 pixi run gaxis quality sheet            # human-ranking sheet for score calibration
 pixi run gaxis quality backfill        # recompute crop_clean + scores, then re-ingest

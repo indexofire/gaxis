@@ -12,6 +12,7 @@ The tutorials map to gaxis's two main workflows, the analysis-recipe bridge, and
 | [06 Operations](06-operations.md) | Automated onboarding queue, scheduled tasks, self-healing checks | Yes | Yes |
 | [07 LLM reconstruction](07-llm-reconstruction.md) | Figure code when author code is missing or broken (labelled `llm_*`) | Yes | No |
 | [08 AMR co-occurrence network](08-amr-network.md) | Table → co-occurrence edges → network figure, no AMR re-calling | No | No |
+| [09 SNP tree workflow](09-snp-tree-workflow.md) | Snakemake scaffold + validation for IQ-TREE; bacmap runs it | No | No |
 
 ## Recommended practice order
 

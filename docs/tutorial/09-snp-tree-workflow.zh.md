@@ -1,0 +1,71 @@
+# 09 SNP 树工作流（Snakemake）
+
+## 目标
+
+对于 gaxis 不自带的工具（IQ-TREE、比对工具），gaxis **生成并校验 Snakemake 工作流**；
+bacmap（或你）执行它，得到的树再作为图的数据。gaxis 不实现系统发育算法。
+
+## 生成项目
+
+```bash
+pixi run gaxis analysis scaffold snp-tree \
+  --out workflows/snp-tree \
+  --alignment alignment.fasta \
+  --container docker://<固定的-iqtree-镜像> \
+  --threads 8 --check
+```
+
+写入：
+
+```
+workflows/snp-tree/
+  Snakefile
+  config.yaml        alignment、model、bootstrap、threads、seed、container
+  README.md
+  workflow.json      recipe id、版本、输入/输出、文件 sha256
+```
+
+`--check` 运行 `snakemake -n`（dry run），只校验配置与 DAG，不执行工具。
+
+## 运行
+
+```bash
+cd workflows/snp-tree
+snakemake --cores 8
+```
+
+输出：
+
+```
+results/tree.nwk
+results/iqtree.log
+```
+
+- 在另一台机器运行前，把 `container` 设为**固定**的 IQ-TREE 镜像（最好用 digest）。
+- `metadata` 可选，留给下一步的树注释。
+- bacmap 可以调度同一个 Snakefile；gaxis 不在执行路径里。
+
+## 校验已有项目
+
+```bash
+pixi run gaxis analysis check workflows/snp-tree
+```
+
+## gaxis 做/不做什么
+
+| 做 | 不做 |
+|---|---|
+| 生成 Snakefile + 配置 + 使用说明 | 运行 IQ-TREE 或比对工具 |
+| 用 `snakemake -n` 校验 DAG | 发明系统发育参数 |
+| 记录输入、输出、文件 hash | 隐藏工具版本（container 显式） |
+
+## 检查点
+
+- [ ] `workflow.json` 含输入、输出与 `files_sha256`；
+- [ ] `gaxis analysis check` 返回 `workflow OK`；
+- [ ] `snakemake -n` 列出两个期望输出；
+- [ ] 真实运行后 `results/tree.nwk` 存在，container 已固定。
+
+## 下一步
+
+树渲染（`tree.nwk` → 带 tip metadata 的发表级树图）是下一步；工作流输出已经是稳定契约。

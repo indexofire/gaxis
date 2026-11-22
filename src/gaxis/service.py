@@ -26,7 +26,13 @@ from .acquire.repo import (
     inventory_repository,
 )
 from .adapt import adapt_script, delimiter_for
-from .analysis import list_recipes, run_amr_cooccurrence
+from .analysis import (
+    check_workflow,
+    list_recipes,
+    list_workflows,
+    run_amr_cooccurrence,
+    scaffold_snp_tree,
+)
 from .compose import collect_panels, compose_panels, page_geometry
 from .config import settings
 from .design import apply_plate_policy
@@ -70,6 +76,7 @@ from .models.tools import (
     SearchChartAssetsRequest,
     SearchChartAssetsResult,
 )
+from .models.workflow import WorkflowScaffold
 from .quality import (
     CalibrationReport,
     CalibrationRow,
@@ -1464,6 +1471,44 @@ def _template_code(page: dict[str, Any], data_root: Path) -> str | None:
 def analysis_recipes() -> list[dict[str, Any]]:
     """Available analysis recipes (table -> table); no algorithm is invented here."""
     return list_recipes()
+
+
+def analysis_workflows() -> list[dict[str, Any]]:
+    """Available Snakemake workflow recipes (scaffold + validate only)."""
+    return list_workflows()
+
+
+def analysis_scaffold(
+    workflow: str,
+    *,
+    out_dir: Path,
+    alignment: Path,
+    metadata: Path | None = None,
+    model: str = "GTR+G",
+    bootstrap: int = 1000,
+    threads: int = 4,
+    seed: int = 42,
+    container: str = "",
+    check: bool = False,
+) -> tuple[WorkflowScaffold, str]:
+    """Generate a workflow project; optionally validate it with `snakemake -n`."""
+    if workflow != "snp-tree":
+        raise GaxisError("unknown_workflow", f"unknown workflow {workflow!r}")
+    if check and not alignment.is_file():
+        raise GaxisError("data_not_found", f"alignment not found: {alignment}")
+    scaffold = scaffold_snp_tree(
+        out_dir,
+        alignment=alignment,
+        metadata=metadata,
+        model=model,
+        bootstrap=bootstrap,
+        threads=threads,
+        seed=seed,
+        container=container,
+    )
+    output = check_workflow(out_dir) if check else ""
+    scaffold.check = output
+    return scaffold, output
 
 
 def analysis_run(

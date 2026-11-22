@@ -7,5 +7,13 @@ typing, AMR calling) belongs to bacmap/gmlst/gspec/gside and is never re-run her
 """
 
 from .amr import RECIPE_AMR, list_recipes, run_amr_cooccurrence
+from .workflows import check_workflow, list_workflows, scaffold_snp_tree
 
-__all__ = ["RECIPE_AMR", "list_recipes", "run_amr_cooccurrence"]
+__all__ = [
+    "RECIPE_AMR",
+    "check_workflow",
+    "list_recipes",
+    "list_workflows",
+    "run_amr_cooccurrence",
+    "scaffold_snp_tree",
+]

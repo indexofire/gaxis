@@ -932,6 +932,80 @@ def analysis_list(as_json: bool = typer.Option(False, "--json")) -> None:
         typer.echo(f"  note:    {recipe['note']}")
 
 
+@analysis_app.command("workflows")
+def analysis_workflows_cmd(as_json: bool = typer.Option(False, "--json")) -> None:
+    """List Snakemake workflow recipes (scaffold + validate; bacmap runs them)."""
+    workflows = service.analysis_workflows()
+    if as_json:
+        _echo_json(workflows)
+        return
+    for workflow in workflows:
+        typer.echo(f"{workflow['id']} ({workflow['version']}): {workflow['note']}")
+        typer.echo(f"  inputs:  {', '.join(workflow['inputs'])}")
+        typer.echo(f"  outputs: {', '.join(workflow['outputs'])}")
+        typer.echo(f"  tools:   {', '.join(workflow['tools'])}")
+
+
+@analysis_app.command("scaffold")
+def analysis_scaffold_cmd(
+    workflow: str = typer.Argument(..., help="workflow id, e.g. snp-tree"),
+    out: Path = typer.Option(..., "--out", help="project directory"),
+    alignment: Path = typer.Option(..., "--alignment", help="FASTA alignment"),
+    metadata: Path | None = typer.Option(None, "--metadata"),
+    model: str = typer.Option("GTR+G", "--model"),
+    bootstrap: int = typer.Option(1000, "--bootstrap"),
+    threads: int = typer.Option(4, "--threads"),
+    seed: int = typer.Option(42, "--seed"),
+    container: str = typer.Option(
+        "", "--container", help="pinned IQ-TREE image (digest preferred)"
+    ),
+    check: bool = typer.Option(False, "--check", help="validate with `snakemake -n`"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """Generate a Snakemake project for an analysis gaxis does not execute itself."""
+    try:
+        scaffold, output = service.analysis_scaffold(
+            workflow,
+            out_dir=out,
+            alignment=alignment,
+            metadata=metadata,
+            model=model,
+            bootstrap=bootstrap,
+            threads=threads,
+            seed=seed,
+            container=container,
+            check=check,
+        )
+    except GaxisError as exc:
+        _fail(exc)
+        return
+    if as_json:
+        _echo_json(json.loads(scaffold.model_dump_json()))
+        return
+    typer.echo(f"workflow: {scaffold.workflow_id} ({scaffold.version})")
+    typer.echo(f"out:      {scaffold.out_dir}")
+    typer.echo(f"files:    {', '.join(scaffold.files)}")
+    typer.echo(f"container:{scaffold.container or ' (not set; pin one before running)'}")
+    typer.echo(f"run:      cd {scaffold.out_dir} && snakemake --cores {threads}")
+    if output:
+        typer.echo("check:    OK")
+        typer.echo(output.splitlines()[-6:] and "\n".join(output.splitlines()[-6:]))
+
+
+@analysis_app.command("check")
+def analysis_check_cmd(
+    directory: Path = typer.Argument(..., help="workflow project directory"),
+) -> None:
+    """Validate a workflow project with `snakemake -n`."""
+    try:
+        output = service.check_workflow(directory)
+    except GaxisError as exc:
+        _fail(exc)
+        return
+    typer.echo("workflow OK")
+    typer.echo("\n".join(output.splitlines()[-8:]))
+
+
 @analysis_app.command("run")
 def analysis_run_cmd(
     recipe: str = typer.Argument(..., help="recipe id, e.g. amr-cooccurrence"),

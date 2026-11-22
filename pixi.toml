@@ -24,6 +24,7 @@ pymupdf = ">=1.24"
 # gbrain runtime (knowledge base, M3): TypeScript CLI executed by bun
 bun = ">=1.2"
 
+
 [feature.dev.dependencies]
 pytest = ">=8"
 ruff = ">=0.5"
@@ -37,6 +38,7 @@ gaxis = { path = ".", editable = true }
 mcp = ">=1.2"
 mkdocs-material = ">=9.5"
 mkdocs-static-i18n = ">=1.2"
+snakemake = ">=8"
 
 [tasks]
 gbrain-install = "bash scripts/install_gbrain.sh"

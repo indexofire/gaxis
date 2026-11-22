@@ -26,6 +26,11 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **SNP-tree workflow recipe**: `gaxis analysis scaffold snp-tree` writes a Snakemake project
+  (Snakefile, config, README, `workflow.json` with file hashes) and `gaxis analysis check` validates
+  it with `snakemake -n`. gaxis does not run IQ-TREE; bacmap or the user executes the workflow and
+  gaxis renders the resulting tree in the next step. `snakemake` added as an optional `analysis`
+  dependency.
 - **Analysis recipes + network chart**: `gaxis analysis run amr-cooccurrence` computes AMR gene
   co-occurrence from a long `sample,gene[,gene_class]` table (Jaccard/shared support, input hash,
   `analysis.json`) and `gaxis render --chart network --x source --y target --weight weight` renders
