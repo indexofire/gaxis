@@ -46,6 +46,18 @@ results/iqtree.log
 - `metadata` is optional and reserved for tree annotation in the next step.
 - bacmap can schedule the same Snakefile; gaxis is not in the execution path.
 
+## Join tip metadata (optional)
+
+```bash
+pixi run gaxis analysis run newick-to-table \
+  --input results/tree.nwk --metadata metadata.csv --out data/analysis
+```
+
+`metadata.csv` needs a key column (`tip`, `sample`, `id`, `name`, `genome`, `strain` or
+`isolate`) plus any annotation columns; values are copied onto tip rows, so the tree table
+gains `source`, `amr_class`, etc. Missing tips are listed in `metadata_missing.txt` inside the
+run directory instead of being guessed.
+
 ## Render the tree
 
 ```bash
@@ -54,14 +66,15 @@ pixi run gaxis analysis run newick-to-table \
 
 pixi run gaxis render \
   --data data/analysis/<run_id>/tree_edges.csv \
-  --chart tree --x parent --y child --weight branch_length \
+  --chart tree --x parent --y child --weight branch_length --hue source \
   --preset asm --out data/figures
 ```
 
-Rectangular cladogram, branch lengths from `branch_length`, tip labels; matplotlib and
-ggplot2 both render it. The tree itself still comes from IQ-TREE, not gaxis.
+Rectangular cladogram, branch lengths from `branch_length`, tip labels, and a colour band
+per tip from `--hue` (`source` in this example) with a legend. matplotlib and ggplot2 both
+render it. The tree itself still comes from IQ-TREE, not gaxis.
 
-![Tree example](/gaxis/assets/example-tree.png)
+![Annotated tree example](/gaxis/assets/example-tree.png)
 
 ## Validate another checkout
 
@@ -86,5 +99,6 @@ pixi run gaxis analysis check workflows/snp-tree
 
 ## Next
 
-Tree annotation (AMR class / source / type colour bands next to the tips) is the next step; the
-tree layout and workflow output are already stable contracts.
+Multi-column annotation strips (source + AMR class + type side by side) and shared legends with
+the AMR network figure are the next step; the single-column annotation and workflow output are
+stable contracts.

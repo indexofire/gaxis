@@ -69,11 +69,50 @@ for parent, child, _length in edges:
     ax.plot([x0, x1], [y0, y0], color="black", linewidth=line_width)
     ax.plot([x1, x1], [y0, y1], color="black", linewidth=line_width)
 
+hue = SPEC["hue"]
+tip_meta = {}
+if hue:
+    for row in rows:
+        child = row.get(SPEC["y"], "")
+        value = row.get(hue, "")
+        if child in positions and value not in MISSING:
+            tip_meta[child] = value
+    groups = sorted(set(tip_meta.values()))
+    group_color = {group: COLORS[index % len(COLORS)] for index, group in enumerate(groups)}
+    from matplotlib.patches import Patch
+
+    ax.legend(
+        handles=[
+            Patch(facecolor=group_color[group], label=group) for group in groups
+        ],
+        title=hue,
+        loc="upper left",
+        bbox_to_anchor=(1.01, 1.0),
+        borderaxespad=0.0,
+        frameon=False,
+        fontsize=float(matplotlib.rcParams["font.size"]) * 0.85,
+        title_fontsize=float(matplotlib.rcParams["font.size"]) * 0.85,
+    )
+
 offset = 0.015
 for tip in order:
+    x = depth[tip] / span
+    y = positions[tip]
+    if hue and tip in tip_meta:
+        ax.scatter(
+            [x + offset],
+            [y],
+            marker="s",
+            s=18,
+            color=group_color[tip_meta[tip]],
+            zorder=3,
+        )
+        label_x = x + 0.045
+    else:
+        label_x = x + offset
     ax.text(
-        depth[tip] / span + offset,
-        positions[tip],
+        label_x,
+        y,
         tip,
         ha="left",
         va="center",

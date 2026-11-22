@@ -18,10 +18,10 @@ from ..models.analysis import AnalysisRun
 
 RECIPE_TREE = {
     "id": "newick-to-table",
-    "title": "Newick tree -> edge table",
-    "input": ".nwk/.newick/.tree Newick file",
+    "title": "Newick tree -> edge table (optional tip metadata)",
+    "input": ".nwk/.newick/.tree Newick file, optional metadata table",
     "outputs": ["tree_edges.csv"],
-    "params": [],
+    "params": ["metadata"],
     "engine": "python (stdlib only)",
     "note": "layout/format conversion only; the tree itself comes from IQ-TREE or bacmap",
 }
@@ -166,17 +166,64 @@ def parse_newick(text: str) -> list[dict[str, Any]]:
     return edges
 
 
-def run_newick_to_table(input_path: Path, *, out_dir: Path) -> AnalysisRun:
+def _read_metadata(
+    path: Path,
+) -> tuple[dict[str, dict[str, str]], list[str]]:
+    if not path.is_file():
+        raise GaxisError("data_not_found", f"metadata table not found: {path}")
+    delimiter = "\t" if path.suffix.lower() in {".tsv", ".tab"} else ","
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle, delimiter=delimiter)
+        header = reader.fieldnames or []
+        keys = ("tip", "sample", "id", "name", "genome", "strain", "isolate")
+        key = next((name for name in header if name.lower() in keys), header[0] if header else "")
+        if not key:
+            raise GaxisError("data_contract_violation", "metadata table has no key column")
+        columns = [name for name in header if name != key]
+        records: dict[str, dict[str, str]] = {}
+        for row in reader:
+            value = (row.get(key) or "").strip()
+            if value:
+                records[value] = {name: (row.get(name) or "").strip() for name in columns}
+    if not records:
+        raise GaxisError("empty_input", "metadata table has no rows")
+    return records, columns
+
+
+def run_newick_to_table(
+    input_path: Path, *, out_dir: Path, metadata_path: Path | None = None
+) -> AnalysisRun:
     if not input_path.is_file():
         raise GaxisError("data_not_found", f"tree file not found: {input_path}")
+    out_dir = out_dir.expanduser().resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
     edges = parse_newick(input_path.read_text(encoding="utf-8", errors="replace"))
+    metadata: dict[str, dict[str, str]] = {}
+    metadata_columns: list[str] = []
+    metadata_sha = ""
+    unmatched: list[str] = []
+    if metadata_path is not None:
+        metadata, metadata_columns = _read_metadata(metadata_path)
+        metadata_sha = hashlib.sha256(metadata_path.read_bytes()).hexdigest()
+        tips = {edge["child"] for edge in edges if edge["is_tip"]}
+        for edge in edges:
+            if not edge["is_tip"]:
+                continue
+            values = metadata.get(str(edge["child"]), {})
+            for column in metadata_columns:
+                edge[column] = values.get(column, "")
+        unmatched = sorted(tips - set(metadata))
     digest = hashlib.sha256(input_path.read_bytes()).hexdigest()
     run_id = hashlib.sha256(f"newick-to-table-v1:{digest}".encode()).hexdigest()[:10]
     target = out_dir / run_id
     target.mkdir(parents=True, exist_ok=True)
+    if unmatched:
+        # Metadata is optional per tip; record the gap instead of guessing.
+        (target / "metadata_missing.txt").write_text("\n".join(unmatched) + "\n", encoding="utf-8")
     path = target / "tree_edges.csv"
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["parent", "child", "branch_length", "is_tip"])
+        fieldnames = ["parent", "child", "branch_length", "is_tip", *metadata_columns]
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(edges)
     run = AnalysisRun(
@@ -184,7 +231,11 @@ def run_newick_to_table(input_path: Path, *, out_dir: Path) -> AnalysisRun:
         recipe="newick-to-table",
         input_path=str(input_path),
         input_sha256=digest,
-        params={},
+        params={
+            "metadata": str(metadata_path) if metadata_path else "",
+            "metadata_sha256": metadata_sha,
+            "metadata_columns": metadata_columns,
+        },
         samples=0,
         genes=0,
         edges=len(edges),

@@ -102,7 +102,7 @@ Single-figure reproduction → grading → automatic assetization + KB refresh.
 |---|---|
 | `gaxis analysis list [--json]` | available analysis recipes, input contract, outputs |
 | `gaxis analysis run amr-cooccurrence --input TABLE [--out DIR] [--min-prevalence F] [--min-support N] [--weight jaccard\|count]` | table → `nodes.csv` + `edges.csv` + `analysis.json` |
-| `gaxis analysis run newick-to-table --input tree.nwk [--out DIR]` | Newick → `tree_edges.csv` (parent, child, branch_length) |
+| `gaxis analysis run newick-to-table --input tree.nwk [--metadata META] [--out DIR]` | Newick → `tree_edges.csv` (parent, child, branch_length) |
 | `gaxis analysis workflows` | list Snakemake workflow recipes |
 | `gaxis analysis scaffold snp-tree --out DIR --alignment FASTA [--container IMAGE] [--check]` | generate a validated IQ-TREE workflow project |
 | `gaxis analysis check DIR` | validate an existing workflow with `snakemake -n` |

@@ -45,6 +45,17 @@ results/iqtree.log
 - `metadata` 可选，留给下一步的树注释。
 - bacmap 可以调度同一个 Snakefile；gaxis 不在执行路径里。
 
+## 合并 tip metadata（可选）
+
+```bash
+pixi run gaxis analysis run newick-to-table \
+  --input results/tree.nwk --metadata metadata.csv --out data/analysis
+```
+
+`metadata.csv` 需要一个 key 列（`tip`、`sample`、`id`、`name`、`genome`、`strain` 或 `isolate`）
+以及任意注释列；值会复制到 tip 行，树表因此多出 `source`、`amr_class` 等列。缺失的 tip 会写入
+运行目录的 `metadata_missing.txt`，不猜。
+
 ## 渲染树
 
 ```bash
@@ -53,14 +64,14 @@ pixi run gaxis analysis run newick-to-table \
 
 pixi run gaxis render \
   --data data/analysis/<run_id>/tree_edges.csv \
-  --chart tree --x parent --y child --weight branch_length \
+  --chart tree --x parent --y child --weight branch_length --hue source \
   --preset asm --out data/figures
 ```
 
-矩形进化树；分支长度来自 `branch_length`，tip 标签自动放置；matplotlib 与 ggplot2 双后端。
-树本身仍由 IQ-TREE 生成，gaxis 只做布局与出图。
+矩形进化树；分支长度来自 `branch_length`，tip 标签自动放置，`--hue`（这里是 `source`）在 tip
+旁画色带并生成图例。matplotlib 与 ggplot2 双后端。树本身仍由 IQ-TREE 生成，gaxis 只做布局与出图。
 
-![树图示例](/gaxis/assets/example-tree.png)
+![带注释的树图示例](/gaxis/assets/example-tree.png)
 
 ## 校验已有项目
 
@@ -85,4 +96,5 @@ pixi run gaxis analysis check workflows/snp-tree
 
 ## 下一步
 
-树注释（AMR 类别 / 来源 / 型别色带贴在 tip 旁）是下一步；树布局与工作流输出已经是稳定契约。
+多列注释条（source + AMR class + 型别并排）以及与 AMR 网络图共享图例是下一步；单列注释与工作流
+输出已经是稳定契约。

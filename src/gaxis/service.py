@@ -1518,12 +1518,13 @@ def analysis_run(
     input_path: Path,
     out_dir: Path | None = None,
     params: AmrCooccurrenceParams | None = None,
+    metadata_path: Path | None = None,
 ) -> AnalysisRun:
     """Run an analysis recipe on the user's table and write nodes/edges."""
     conf = settings()
     target = (out_dir or (conf.data_root / "analysis")).expanduser().resolve()
     if recipe == "newick-to-table":
-        return run_newick_to_table(input_path, out_dir=target)
+        return run_newick_to_table(input_path, out_dir=target, metadata_path=metadata_path)
     if recipe != "amr-cooccurrence":
         raise GaxisError(
             "unknown_recipe",

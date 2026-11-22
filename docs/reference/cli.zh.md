@@ -102,7 +102,7 @@
 |---|---|
 | `gaxis analysis list [--json]` | 可用分析 recipe、输入契约、输出 |
 | `gaxis analysis run amr-cooccurrence --input TABLE [--out DIR] [--min-prevalence F] [--min-support N] [--weight jaccard\|count]` | 表 → `nodes.csv` + `edges.csv` + `analysis.json` |
-| `gaxis analysis run newick-to-table --input tree.nwk [--out DIR]` | Newick → `tree_edges.csv`（parent、child、branch_length） |
+| `gaxis analysis run newick-to-table --input tree.nwk [--metadata META] [--out DIR]` | Newick → `tree_edges.csv`（parent、child、branch_length） |
 | `gaxis analysis workflows` | 列出 Snakemake 工作流 recipe |
 | `gaxis analysis scaffold snp-tree --out DIR --alignment FASTA [--container IMAGE] [--check]` | 生成并校验 IQ-TREE 工作流项目 |
 | `gaxis analysis check DIR` | 用 `snakemake -n` 校验已有工作流 |

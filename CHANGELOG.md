@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Tree annotation**: `newick-to-table --metadata` joins a tip metadata table onto the tree
+  (key: tip/sample/id/name/genome/strain/isolate; missing tips listed in `metadata_missing.txt`);
+  `gaxis render --chart tree ... --hue source` draws a coloured tip band + legend in both backends.
 - **Tree chart + Newick conversion**: `gaxis analysis run newick-to-table` converts a Newick tree to
   a parent/child/branch table; `gaxis render --chart tree --x parent --y child --weight branch_length`
   draws a rectangular cladogram in both backends. Contract v2.3. The tree still comes from IQ-TREE.

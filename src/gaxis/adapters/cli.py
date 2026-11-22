@@ -1009,7 +1009,10 @@ def analysis_check_cmd(
 @analysis_app.command("run")
 def analysis_run_cmd(
     recipe: str = typer.Argument(..., help="recipe id, e.g. amr-cooccurrence"),
-    input: Path = typer.Option(..., "--input", "-i", help="long table: sample,gene[,gene_class]"),
+    input: Path = typer.Option(..., "--input", "-i", help="long table or Newick file"),
+    metadata: Path | None = typer.Option(
+        None, "--metadata", help="tip metadata table for newick-to-table"
+    ),
     out: Path | None = typer.Option(None, "--out"),
     min_prevalence: float = typer.Option(0.05, "--min-prevalence"),
     min_support: int = typer.Option(2, "--min-support"),
@@ -1024,6 +1027,7 @@ def analysis_run_cmd(
             recipe,
             input_path=input,
             out_dir=out,
+            metadata_path=metadata,
             params=AmrCooccurrenceParams(
                 min_prevalence=min_prevalence,
                 min_support=min_support,

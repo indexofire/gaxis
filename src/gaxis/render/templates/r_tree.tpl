@@ -15,6 +15,10 @@ edges <- edges[
   drop = FALSE
 ]
 if (nrow(edges) == 0) stop("no branches to draw: check x/y/weight columns")
+if (!("is_tip" %in% names(edges))) {
+  edges$is_tip <- as.integer(!(edges$child %in% edges$parent))
+}
+if (!is.null(SPEC$hue)) edges$group <- as.character(raw[[SPEC$hue]]) else edges$group <- NA
 
 kids <- split(edges$child, edges$parent)
 branch <- setNames(edges$length, edges$child)
@@ -45,7 +49,14 @@ x1 <- depth[edges$child] / span
 y1 <- ypos[edges$child]
 horizontal <- data.frame(x = x0, y = y0, xend = x1, yend = y0)
 vertical <- data.frame(x = x1, y = y0, xend = x1, yend = y1)
-labels <- data.frame(x = x1 + 0.015, y = y1, label = edges$child)
+labels <- data.frame(
+  x = x1 + if (is.null(SPEC$hue)) 0.015 else 0.035,
+  y = y1,
+  label = edges$child,
+  group = edges$group,
+  is_tip = edges$is_tip
+)
+labels <- labels[labels$is_tip == 1, , drop = FALSE]
 
 p <- ggplot() +
   geom_segment(data = horizontal, aes(x = x, y = y, xend = xend, yend = yend),
@@ -54,6 +65,15 @@ p <- ggplot() +
                linewidth = pt_to_lwd(LINE_WIDTH), colour = "black") +
   geom_text(data = labels, aes(x = x, y = y, label = label),
             hjust = 0, size = BASE_PT / .pt, family = FONT_FAMILY) +
+  { if (is.null(SPEC$hue)) NULL else
+      list(
+        geom_point(data = labels, aes(x = x - 0.02, y = y, colour = group),
+                   shape = 15, size = 1.6),
+        scale_colour_manual(values = COLORS, name = SPEC$hue),
+        theme(legend.position = "right",
+              legend.title = element_text(size = BASE_PT),
+              legend.text = element_text(size = BASE_PT))
+      ) } +
   coord_cartesian(xlim = c(0, 1.15), ylim = c(-0.8, nrow(labels) - 0.2), clip = "off") +
   theme_void(base_size = BASE_PT, base_family = FONT_FAMILY) +
   theme(plot.title = element_text(size = TITLE_PT, hjust = 0),
