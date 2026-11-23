@@ -1,4 +1,4 @@
-"""MCP tool contract v2.5 — frozen surface between the kernel and every host.
+"""MCP tool contract v2.6 — frozen surface between the kernel and every host.
 
 Seven tools, one core. Hosts (bacmap, DSH, Pi, Hermes, CLI) only translate; the
 kernel never learns about a host SDK (ADR-05). Every tool declares its data
@@ -17,6 +17,12 @@ from .. import __version__
 from .composition import CompositionManifest
 from .lint import LintReport
 from .manifest import FigureManifest, OutputFile
+from .recipe import (
+    ListFigureRecipesRequest,
+    ListFigureRecipesResult,
+    RenderFigureRecipeRequest,
+    RenderFigureRecipeResult,
+)
 from .schema import DataSchema
 from .spec import ChartSpec, ChartType
 
@@ -404,6 +410,8 @@ _INPUT_MODELS: dict[str, type[BaseModel]] = {
     "reproduce_chart_code": ReproduceChartCodeRequest,
     "adapt_chart_code": AdaptChartCodeRequest,
     "compose_panels": ComposePanelsRequest,
+    "list_figure_recipes": ListFigureRecipesRequest,
+    "render_figure_recipe": RenderFigureRecipeRequest,
     "plan_chart_from_brief": PlanChartRequest,
     "ingest_paper": IngestPaperRequest,
     "health": _EmptyRequest,
@@ -416,6 +424,8 @@ _OUTPUT_MODELS: dict[str, type[BaseModel]] = {
     "reproduce_chart_code": ReproduceChartCodeResult,
     "adapt_chart_code": AdaptChartCodeResult,
     "compose_panels": CompositionManifest,
+    "list_figure_recipes": ListFigureRecipesResult,
+    "render_figure_recipe": RenderFigureRecipeResult,
     "plan_chart_from_brief": PlanChartResult,
     "ingest_paper": IngestPaperResult,
     "health": HealthStatus,
@@ -480,6 +490,26 @@ _ROWS = [
         "s",
         True,
         "M4 KB templates (builtin fallback reported)",
+    ),
+    (
+        "list_figure_recipes",
+        "List curated table-to-figure recipes (input contract, encodings, preset).",
+        DataClass.d1_public,
+        [],
+        False,
+        "ms",
+        True,
+        "M4",
+    ),
+    (
+        "render_figure_recipe",
+        "Render a curated figure recipe against a user table; returns figure, script and manifest.",
+        DataClass.d3_sensitive,
+        ["reads data file", "writes data/renders", "executes sandboxed script"],
+        False,
+        "s",
+        True,
+        "M4",
     ),
     (
         "compose_panels",

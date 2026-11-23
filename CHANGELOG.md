@@ -26,6 +26,10 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Figure recipes over MCP**: `list_figure_recipes` (D1) and `render_figure_recipe` (D3) expose
+  curated table→figure contracts (`amr-network`, `amr-prevalence-bar`, `snp-tree`) from
+  `style/figure_recipes.toml`; required columns are checked before rendering and the manifest records
+  `recipe_id` + `source: figure_recipe`. Contract v2.6.
 - **bacmap → gaxis handoff**: `integrations/bacmap_export.py` converts a bacmap results run into
   `amr_long.csv` + `metadata.csv`; tutorial 10 runs the real 20-Salmonella AMR network without
   re-calling AMR tools.

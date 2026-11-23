@@ -242,3 +242,26 @@ def test_http_refuses_to_start_without_a_token(tmp_path: Path) -> None:
     )
     assert completed.returncode == 2
     assert "bearer token" in completed.stderr
+
+
+def test_figure_recipes_over_mcp(live_server: str, tmp_path: Path) -> None:
+    from gaxis.models.recipe import RenderFigureRecipeRequest
+
+    edges = Path(__file__).parent / "data" / "amr_edges.csv"
+
+    async def run() -> None:
+        async with GaxisClient(live_server, token=TOKEN, timeout_s=180) as client:
+            recipes = await client.list_figure_recipes()
+            assert any(recipe.recipe_id == "amr-network" for recipe in recipes.recipes)
+            rendered = await client.render_figure_recipe(
+                RenderFigureRecipeRequest(
+                    recipe_id="amr-network",
+                    data_path=str(edges),
+                    out_dir=str(tmp_path / "recipe"),
+                )
+            )
+            assert rendered.recipe_id == "amr-network"
+            assert rendered.lint.ok, rendered.lint.format_text()
+            assert Path(rendered.code_path).is_file()
+
+    asyncio.run(run())

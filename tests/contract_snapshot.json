@@ -1,5 +1,5 @@
 {
-  "contract_version": "v2.5",
+  "contract_version": "v2.6",
   "tools": {
     "adapt_chart_code": {
       "data_class": "D3",
@@ -120,6 +120,16 @@
         "title"
       ]
     },
+    "list_figure_recipes": {
+      "data_class": "D1",
+      "inputs": [
+        "chart_type"
+      ],
+      "outputs": [
+        "recipes",
+        "total"
+      ]
+    },
     "plan_chart_from_brief": {
       "data_class": "D1",
       "inputs": [
@@ -174,6 +184,27 @@
         "manifest",
         "manifest_path",
         "outputs"
+      ]
+    },
+    "render_figure_recipe": {
+      "data_class": "D3",
+      "inputs": [
+        "color_map",
+        "data_path",
+        "dry_run",
+        "out_dir",
+        "preset",
+        "recipe_id"
+      ],
+      "outputs": [
+        "code_path",
+        "figure_id",
+        "lint",
+        "manifest",
+        "not_implemented",
+        "outputs",
+        "recipe_id",
+        "source"
       ]
     },
     "reproduce_chart_code": {

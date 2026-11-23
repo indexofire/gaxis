@@ -4,7 +4,7 @@ from pathlib import Path
 from gaxis.models.tools import TOOL_SPECS
 
 SNAPSHOT = Path(__file__).parent / "contract_snapshot.json"
-CONTRACT_VERSION = "v2.5"
+CONTRACT_VERSION = "v2.6"
 EXPECTED_TOOLS = {
     "describe_data_schema",
     "render_chart_from_data",
@@ -13,6 +13,8 @@ EXPECTED_TOOLS = {
     "reproduce_chart_code",
     "adapt_chart_code",
     "compose_panels",
+    "list_figure_recipes",
+    "render_figure_recipe",
     "plan_chart_from_brief",
     "ingest_paper",
     "health",
@@ -22,6 +24,8 @@ IMPLEMENTED_NOW = {
     "render_chart_from_data",
     "adapt_chart_code",
     "compose_panels",
+    "list_figure_recipes",
+    "render_figure_recipe",
     "plan_chart_from_brief",
     "get_chart_manifest",
     "ingest_paper",

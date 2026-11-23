@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import json
 import logging
 import shutil
 from collections.abc import Callable
@@ -40,6 +41,7 @@ from .design import apply_plate_policy
 from .design_judge import DesignJudgeError, HeuristicJudge, build_judge
 from .errors import GaxisError
 from .exec.runner import run_script
+from .figures import load_figure_recipes
 from .kb.adopt import AdoptedTemplate, adopt_asset, rewrite_path_interface
 from .kb.base import KbError, KbStatus, try_get_page
 from .kb.feedback import record_selection
@@ -52,6 +54,12 @@ from .models.composition import CompositionManifest
 from .models.lint import LintReport
 from .models.manifest import FigureManifest, FigureSource, OutputFile
 from .models.paper import ChartReproManifest, CodeCandidate
+from .models.recipe import (
+    ListFigureRecipesRequest,
+    ListFigureRecipesResult,
+    RenderFigureRecipeRequest,
+    RenderFigureRecipeResult,
+)
 from .models.reconstruct import ReconstructResult
 from .models.schema import ColumnKind, DataSchema, describe_data
 from .models.spec import ChartSpec, ChartType
@@ -1477,6 +1485,72 @@ def _template_code(page: dict[str, Any], data_root: Path) -> str | None:
             block = blocks[1]
             return block.split("\n", 1)[1] if "\n" in block else block
     return None
+
+
+def figure_recipes(request: ListFigureRecipesRequest | None = None) -> ListFigureRecipesResult:
+    """Curated table -> figure recipes; no analysis is run here."""
+    recipes = load_figure_recipes()
+    if request and request.chart_type:
+        recipes = [recipe for recipe in recipes if recipe.chart_type == request.chart_type]
+    return ListFigureRecipesResult(recipes=recipes, total=len(recipes))
+
+
+def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureRecipeResult:
+    """Render a curated recipe after checking its input contract."""
+    recipe = next(
+        (item for item in load_figure_recipes() if item.recipe_id == request.recipe_id),
+        None,
+    )
+    if recipe is None:
+        raise GaxisError(
+            "unknown_recipe",
+            f"unknown figure recipe {request.recipe_id!r}",
+            hint="call list_figure_recipes",
+        )
+    schema = describe_data(request.data_path)
+    missing = [name for name in recipe.required_columns if not schema.has(name)]
+    if missing:
+        raise GaxisError(
+            "recipe_contract_violation",
+            f"{recipe.recipe_id} requires columns {missing}",
+            hint=f"available columns: {[column.name for column in schema.columns]}",
+        )
+    spec = infer_spec(
+        schema,
+        chart_type=recipe.chart_type,
+        x=recipe.x,
+        y=recipe.y,
+        hue=recipe.hue,
+        weight=recipe.weight,
+        preset=request.preset or recipe.preset,
+    ).model_copy(
+        update={
+            "annotations": list(recipe.annotations),
+            "color_map": dict(request.color_map),
+        }
+    )
+    result = render_spec(
+        schema,
+        spec,
+        out_dir=Path(request.out_dir).expanduser().resolve() if request.out_dir else None,
+        source="figure_recipe",
+        execute=not request.dry_run,
+    )
+    result.manifest.recipe_id = recipe.recipe_id
+    if result.manifest_path:
+        Path(result.manifest_path).write_text(
+            result.manifest.model_dump_json(indent=2), encoding="utf-8"
+        )
+    return RenderFigureRecipeResult(
+        recipe_id=recipe.recipe_id,
+        figure_id=result.figure_id,
+        code_path=result.code_path,
+        outputs=result.outputs,
+        lint=result.lint,
+        manifest=json.loads(result.manifest.model_dump_json()),
+        source="figure_recipe",
+        not_implemented=False,
+    )
 
 
 def analysis_recipes() -> list[dict[str, Any]]:

@@ -112,7 +112,7 @@ Until M1–M4 land, the paper side degrades instead of failing:
 | `reproduce_chart_code` | `not_implemented: true`, `run_status: "skipped"` | M2: podman sandbox + L1/L2/L3 |
 | `adapt_chart_code` | works, `source: "builtin_templates"`, `fallback_reason` explains | M4: `source: "kb_asset"` with `asset_ids` |
 
-This is intentional: a host can wire all ten tools today and get better answers over time without
+This is intentional: a host can wire all twelve tools today and get better answers over time without
 changing its own code.
 
 ## 8. Failure modes and what they look like

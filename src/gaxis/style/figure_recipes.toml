@@ -1,0 +1,40 @@
+# Curated figure recipes: input table -> ChartSpec.
+# A recipe never computes analysis; it only binds columns to a visual grammar.
+
+[[recipe]]
+id = "amr-network"
+title = "AMR co-occurrence network"
+description = "Gene co-occurrence edges from `gaxis analysis run amr-cooccurrence`."
+chart_type = "network"
+x = "source"
+y = "target"
+weight = "weight"
+preset = "asm"
+required = ["source", "target", "weight"]
+optional = ["source_class", "target_class", "support", "jaccard"]
+
+[[recipe]]
+id = "amr-prevalence-bar"
+title = "AMR gene prevalence"
+description = "Prevalence per gene from the `nodes.csv` of the AMR analysis."
+chart_type = "bar"
+x = "gene"
+y = "prevalence"
+hue = "gene_class"
+preset = "asm"
+required = ["gene", "prevalence"]
+optional = ["gene_class", "samples"]
+
+[[recipe]]
+id = "snp-tree"
+title = "SNP tree with tip annotation"
+description = "Rectangular cladogram from `gaxis analysis run newick-to-table --metadata`."
+chart_type = "tree"
+x = "parent"
+y = "child"
+weight = "branch_length"
+hue = "amr_class"
+annotations = ["source"]
+preset = "asm"
+required = ["parent", "child", "branch_length"]
+optional = ["amr_class", "source", "is_tip"]

@@ -1,4 +1,4 @@
-# MCP tool reference — contract v2.1
+# MCP tool reference — contract v2.6
 
 Frozen surface between the gaxis kernel and every host. Source of truth:
 `src/gaxis/models/tools.py`; snapshot: `tests/contract_snapshot.json`; refresh with
@@ -340,6 +340,37 @@ the ids printed by `render_chart_from_data`, or a path to a panel's `manifest.js
 (`gaxis compose --panels a,b`). A panel without a PDF output is refused with `panel_not_vector`
 rather than being rasterised silently; too-small layouts raise `bad_layout`.
 
+### 2.9 `list_figure_recipes` — D1, ready
+
+```json
+// request
+{"chart_type": "network"}
+// response
+{"recipes": [{"recipe_id": "amr-network", "title": "AMR co-occurrence network",
+              "chart_type": "network", "x": "source", "y": "target", "weight": "weight",
+              "preset": "asm", "required_columns": ["source", "target", "weight"],
+              "optional_columns": ["source_class", "target_class"]}], "total": 1}
+```
+
+Curated table→figure contracts from `style/figure_recipes.toml`. A recipe binds columns and a
+preset; it never computes analysis. Available: `amr-network`, `amr-prevalence-bar`, `snp-tree`.
+
+### 2.10 `render_figure_recipe` — D3, ready
+
+```json
+// request
+{"recipe_id": "amr-network", "data_path": "/abs/edges.csv", "preset": "asm",
+ "color_map": {"beta-lactam": "#E69F00"}, "dry_run": false}
+// response
+{"recipe_id": "amr-network", "figure_id": "network-…", "code_path": "…",
+ "outputs": [...], "lint": {...}, "manifest": {"recipe_id": "amr-network", ...},
+ "source": "figure_recipe", "not_implemented": false}
+```
+
+Checks the recipe's required columns first (`recipe_contract_violation` names the missing ones),
+then renders with the recipe's encodings/preset. The manifest records `recipe_id` and
+`source: figure_recipe`. `dry_run` writes the script/manifest without executing it.
+
 ## 3. Result conventions
 
 - Structured output; hosts that want JSON strings stringify at the adapter boundary.
@@ -360,6 +391,7 @@ rather than being rasterised silently; too-small layouts raise `bad_layout`.
 | v1.5 | M1 completion | identifier resolution (Crossref/arXiv/PubMed/PMC/Unpaywall), PDF download, repository link + plotting-script discovery; ingest result gains `pdf_url`, `repository_urls`, `code_candidate_count`, request gains `with_code` |
 | v1.7 | design tiering | `ChartAssetSummary` gains `design_score` and `design_tier` (gold/dense/reject) |
 | v1.8 | usefulness | `ChartAssetSummary` gains `usefulness_score`; retrieval ranks by design × usefulness |
+| v2.6 | figure recipes | + `list_figure_recipes`, `render_figure_recipe` (curated table→figure contracts) |
 | v2.5 | shared palette | `RenderRequest.color_map` (category → hex) for consistent annotation/node colours |
 | v2.4 | tree annotations | `RenderRequest.annotations` (multiple tip annotation columns) |
 | v2.3 | tree chart | `ChartType` gains `tree` (Newick edges → rectangular cladogram, both backends) |

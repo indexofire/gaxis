@@ -1,4 +1,4 @@
-"""MCP server for gaxis: ten tools over contract v2.5 (ADR-02, ADR-05, ADR-14).
+"""MCP server for gaxis: twelve tools over contract v2.6 (ADR-02, ADR-05, ADR-14).
 
 Run it as a production service:
 
@@ -22,6 +22,10 @@ from mcp.server.mcpserver import MCPServer
 
 from .. import __version__, service
 from ..errors import GaxisError
+from ..models.recipe import (
+    ListFigureRecipesRequest,
+    RenderFigureRecipeRequest,
+)
 from ..models.tools import (
     AdaptChartCodeRequest,
     DescribeDataRequest,
@@ -309,6 +313,53 @@ def build_server() -> MCPServer:
         return result.model_dump(mode="json")
 
     @server.tool(
+        name="list_figure_recipes",
+        description=(
+            "List curated figure recipes: a table contract plus the encodings/preset that render "
+            "it (AMR network, AMR prevalence, SNP tree). No analysis is run."
+        ),
+    )
+    def list_figure_recipes(chart_type: str | None = None) -> dict[str, Any]:
+        try:
+            result = service.figure_recipes(
+                ListFigureRecipesRequest(chart_type=chart_type)  # type: ignore[arg-type]
+            )
+        except GaxisError as exc:
+            return _error(exc)
+        return result.model_dump(mode="json")
+
+    @server.tool(
+        name="render_figure_recipe",
+        description=(
+            "Render a curated figure recipe against a user table. Checks the recipe's required "
+            "columns, renders with the recipe's encodings/preset, returns figure + script + lint."
+        ),
+    )
+    def render_figure_recipe(
+        recipe_id: str,
+        data_path: str,
+        preset: str | None = None,
+        out_dir: str | None = None,
+        color_map: dict[str, str] | None = None,
+        dry_run: bool = False,
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "recipe_id": recipe_id,
+            "data_path": data_path,
+            "dry_run": dry_run,
+            "color_map": color_map or {},
+        }
+        if preset is not None:
+            payload["preset"] = preset
+        if out_dir is not None:
+            payload["out_dir"] = out_dir
+        try:
+            result = service.render_figure_recipe(RenderFigureRecipeRequest(**payload))
+        except GaxisError as exc:
+            return _error(exc)
+        return result.model_dump(mode="json")
+
+    @server.tool(
         name="compose_panels",
         description=(
             "Arrange already-rendered figures (by figure id) on one publication page, keeping "
@@ -353,7 +404,7 @@ def build_server() -> MCPServer:
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
-        prog="gaxis-mcp", description="gaxis MCP server (contract v2.5)"
+        prog="gaxis-mcp", description="gaxis MCP server (contract v2.6)"
     )
     parser.add_argument("--transport", choices=["http", "stdio"], default="http")
     parser.add_argument("--host", default="127.0.0.1")

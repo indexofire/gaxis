@@ -33,7 +33,7 @@ Two surfaces over one core:
   co-occurrence (no AMR re-calling) and `--chart network` renders it in both backends;
   `integrations/bacmap_export.py` turns a bacmap results run into the required tables;
 - operations: checkpointed ingest/reproduce queue, retries, stall reclaim, heartbeat, `ops verify`;
-- surfaces: CLI and MCP server (ten tools, contract v2.1) + typed client + bacmap adapter.
+- surfaces: CLI and MCP server (twelve tools, contract v2.6) + typed client + bacmap adapter.
 
 M5 host adapters beyond CLI/bacmap and the deeper M6 self-healing layers are still in progress;
 known limits are listed in [CHANGELOG.md](CHANGELOG.md#known-limits-in-010).

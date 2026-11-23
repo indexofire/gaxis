@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.5) with data classes."""
+    """Print the frozen MCP tool contract (v2.6) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)

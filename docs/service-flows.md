@@ -143,7 +143,7 @@ The user first completes single-panel figures one by one (each one is an indepen
 1. **Panel scripts can be "source-included" without hitting disk**: run `figure.R` / `figure.py` with `GAXIS_PANEL_SOURCE=1` set; the script only builds the plot object and writes no files — patchwork/cowplot (R) or subfigure (matplotlib) can consume it directly for layout, and vector output is not rasterized.
 2. **The evidence chain is composable**: every panel has `figure_id` + manifest (`code_sha256`, `data.sha256`); the future `compose_panels` only needs to reference the child manifests instead of re-rendering.
 
-`compose_panels` (contract v2.1) is already available: it places the **PDF** of already-rendered panels directly onto one page (vectors preserved, nothing re-drawn), arranged by `ROWSxCOLS` or an automatic grid, with optional A/B/C labels, and outputs a `CompositionManifest`:
+`compose_panels` (contract v2.6) is already available: it places the **PDF** of already-rendered panels directly onto one page (vectors preserved, nothing re-drawn), arranged by `ROWSxCOLS` or an automatic grid, with optional A/B/C labels, and outputs a `CompositionManifest`:
 
 ```
 CompositionManifest {

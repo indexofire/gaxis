@@ -21,6 +21,12 @@ from mcp.client.streamable_http import create_mcp_http_client, streamable_http_c
 
 from .errors import GaxisError
 from .models.composition import CompositionManifest
+from .models.recipe import (
+    ListFigureRecipesRequest,
+    ListFigureRecipesResult,
+    RenderFigureRecipeRequest,
+    RenderFigureRecipeResult,
+)
 from .models.tools import (
     AdaptChartCodeRequest,
     AdaptChartCodeResult,
@@ -164,6 +170,24 @@ class GaxisClient:
             "adapt_chart_code", request.model_dump(mode="json", exclude_none=True)
         )
         return AdaptChartCodeResult.model_validate(payload)
+
+    async def list_figure_recipes(
+        self, request: ListFigureRecipesRequest | None = None
+    ) -> ListFigureRecipesResult:
+        payload = await self.call_tool(
+            "list_figure_recipes",
+            request.model_dump(mode="json", exclude_none=True) if request else {},
+        )
+        return ListFigureRecipesResult.model_validate(payload)
+
+    async def render_figure_recipe(
+        self, request: RenderFigureRecipeRequest
+    ) -> RenderFigureRecipeResult:
+        payload = await self.call_tool(
+            "render_figure_recipe",
+            request.model_dump(mode="json", exclude_none=True),
+        )
+        return RenderFigureRecipeResult.model_validate(payload)
 
     async def compose_panels(self, request: ComposePanelsRequest) -> CompositionManifest:
         payload = await self.call_tool(

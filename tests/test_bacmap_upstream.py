@@ -29,13 +29,14 @@ def test_cloud_profile_hides_local_data_tools() -> None:
         "reproduce_chart_code",
         "plan_chart_from_brief",
         "ingest_paper",
+        "list_figure_recipes",
     }
     assert "render_chart_from_data" not in visible
 
 
 def test_local_trusted_profile_sees_everything() -> None:
     upstream = GaxisUpstream(max_data_class="D4")
-    assert len(upstream.visible_specs()) == 10
+    assert len(upstream.visible_specs()) == 12
 
 
 def test_register_prefixes_and_preserves_schemas() -> None:
@@ -51,6 +52,8 @@ def test_register_prefixes_and_preserves_schemas() -> None:
         "bacmap_chart_reproduce_chart_code",
         "bacmap_chart_adapt_chart_code",
         "bacmap_chart_compose_panels",
+        "bacmap_chart_list_figure_recipes",
+        "bacmap_chart_render_figure_recipe",
         "bacmap_chart_plan_chart_from_brief",
         "bacmap_chart_ingest_paper",
     }

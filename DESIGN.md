@@ -40,7 +40,7 @@ clients:  bacmap (primary) | DSH | Pi | Hermes | CLI | notebook
               ▼
 host adapters (thin, ≤150 lines, no shared imports)
               ▼
-kernel: src/gaxis/service.py  (ten tools, transport-neutral; adapt/compose/ops in siblings)
+kernel: src/gaxis/service.py  (twelve tools, transport-neutral; adapt/compose/ops in siblings)
    ├── models/   pydantic contracts (ChartSpec, DataSchema, FigureManifest, lint, tool I/O)
    ├── spec/     inference
    ├── style/    journal presets, palettes, rcParams, publication lint
@@ -219,9 +219,9 @@ Fonts resolve through `matplotlib.font_manager` with an explicit fallback chain
 Liberation Sans is the resolved metric-compatible Arial substitute; if a fallback happens, lint
 L005 reports it.
 
-## 6. Tool contract v2.1
+## 6. Tool contract v2.6
 
-Ten tools, all declared in `models/tools.py` with exported JSON Schemas, data class, side effects,
+Twelve tools, all declared in `models/tools.py` with exported JSON Schemas, data class, side effects,
 network need, cost and milestone. Reference: `docs/mcp-tools.md`. Frozen by
 `tests/contract_snapshot.json`.
 
@@ -235,6 +235,8 @@ network need, cost and milestone. Reference: `docs/mcp-tools.md`. Frozen by
 | `reproduce_chart_code` | D1 | ready (M2): podman sandbox + similarity grading |
 | `adapt_chart_code` | D3 | ready: verified KB template → rebind → run; explicit fallback |
 | `compose_panels` | D3 | ready: vector composition, composition manifest |
+| `list_figure_recipes` | D1 | ready: curated table→figure contracts |
+| `render_figure_recipe` | D3 | ready: recipe + user table → figure/script/manifest |
 | `plan_chart_from_brief` | D1 | ready (heuristics; KB cases at M3) |
 | `ingest_paper` | D1 | PDF ingest ready (M1); DOI resolution M1, reproduction M2 |
 
