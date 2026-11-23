@@ -94,3 +94,40 @@ def test_amr_cooccurrence_filters_rare_genes(tmp_path: Path) -> None:
     with pytest.raises(GaxisError) as excinfo:
         run_amr_cooccurrence(table, out_dir=tmp_path / "out", params=params)
     assert excinfo.value.code in {"no_genes_pass_filter", "no_edges_pass_filter"}
+
+
+def test_amr_recipe_writes_a_shared_palette(tmp_path: Path) -> None:
+    import json
+
+    table = _amr_table(tmp_path)
+    run = run_amr_cooccurrence(table, out_dir=tmp_path / "analysis")
+    palette = Path(run.outputs["palette"])
+    assert palette.is_file()
+    mapping = json.loads(palette.read_text(encoding="utf-8"))
+    assert set(mapping) == {"beta-lactam", "sulfonamide", "tetracycline"}
+    assert all(value.startswith("#") for value in mapping.values())
+
+
+def test_color_map_is_applied(tmp_path: Path) -> None:
+    mapped = tmp_path / "mapped.csv"
+    mapped.write_text(
+        "source,target,weight,source_class,target_class\n"
+        "blaCTX-M,blaTEM,0.6,beta-lactam,beta-lactam\n"
+        "sul1,tetA,0.3,sulfonamide,tetracycline\n",
+        encoding="utf-8",
+    )
+    result = render(
+        RenderRequest(
+            data_path=str(mapped),
+            out_dir=str(tmp_path / "mapped"),
+            chart_type="network",
+            x="source",
+            y="target",
+            weight="weight",
+            formats=["svg"],
+            preset="asm",
+            color_map={"beta-lactam": "#123456"},
+        )
+    )
+    svg = Path(result.outputs[0].path).read_text(encoding="utf-8")
+    assert "#123456" in svg.lower()

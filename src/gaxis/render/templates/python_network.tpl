@@ -4,6 +4,19 @@ from matplotlib.path import Path
 rows = load_rows(DATA_PATH)
 edges = []
 order = []
+node_group = {}
+has_classes = bool(rows) and "source_class" in rows[0]
+for row in rows:
+    source = row.get(SPEC["x"], "")
+    target = row.get(SPEC["y"], "")
+    if source in MISSING or target in MISSING or source == target:
+        continue
+    if has_classes:
+        node_group.setdefault(source, row.get("source_class", ""))
+        node_group.setdefault(target, row.get("target_class", ""))
+    elif SPEC["hue"]:
+        node_group.setdefault(source, row.get(SPEC["hue"], ""))
+        node_group.setdefault(target, row.get(SPEC["hue"], ""))
 for row in rows:
     source = row.get(SPEC["x"], "")
     target = row.get(SPEC["y"], "")
@@ -55,28 +68,71 @@ for source, target, weight in edges:
         )
     )
 
+groups = sorted({value for value in node_group.values() if value})
+color_map = SPEC.get("color_map", {})
+used = set(color_map.values())
+fallback = [color for color in COLORS if color not in used] or list(COLORS)
+group_color = {}
+next_index = 0
+for value in groups:
+    mapped = color_map.get(value)
+    if mapped:
+        group_color[value] = mapped
+    else:
+        group_color[value] = fallback[next_index % len(fallback)]
+        next_index += 1
 max_degree = max(degree.values()) or 1
-sizes = [30 + 90 * degree[node] / max_degree for node in order]
+sizes = [20 + 45 * degree[node] / max_degree for node in order]
+colors = [
+    group_color.get(node_group.get(node, ""), COLORS[0]) for node in order
+]
 ax.scatter(
     [positions[node][0] for node in order],
     [positions[node][1] for node in order],
     s=sizes,
-    color=COLORS[0],
+    color=colors,
     edgecolors="white",
     linewidths=0.4,
     zorder=3,
 )
+if groups:
+    from matplotlib.lines import Line2D
+
+    ax.legend(
+        handles=[
+            Line2D(
+                [],
+                [],
+                marker="o",
+                linestyle="",
+                markersize=4,
+                markerfacecolor=group_color[group],
+                markeredgecolor="white",
+                label=group,
+            )
+            for group in groups
+        ],
+        title="class",
+        loc="upper left",
+        bbox_to_anchor=(1.01, 1.0),
+        borderaxespad=0.0,
+        frameon=False,
+        fontsize=float(matplotlib.rcParams["font.size"]) * 0.8,
+        title_fontsize=float(matplotlib.rcParams["font.size"]) * 0.8,
+    )
 for node in order:
     x, y = positions[node]
     ax.annotate(
         node,
         (x, y),
-        xytext=(1.06 * x, 1.06 * y),
+        xytext=(1.14 * x, 1.14 * y),
         ha="left" if x >= 0 else "right",
         va="center",
         fontsize=float(matplotlib.rcParams["font.size"]) * 0.85,
     )
 ax.set_aspect("equal")
+ax.set_xlim(-1.4, 1.4)
+ax.set_ylim(-1.4, 1.4)
 ax.axis("off")
 # Keep the journal page size: a circular layout has empty corners, so the
 # globally-tight bbox would silently shrink the delivered PDF.

@@ -49,6 +49,13 @@ def _r(value: Any) -> str:
     return json.dumps(str(value), ensure_ascii=False)
 
 
+def _r_map(mapping: dict[str, str]) -> str:
+    if not mapping:
+        return "list()"
+    entries = ", ".join(f"{_r(key)} = {_r(value)}" for key, value in sorted(mapping.items()))
+    return f"list({entries})"
+
+
 def _docstring(spec: ChartSpec, preset: Preset, schema: DataSchema) -> str:
     y = spec.y or "counts"
     x = spec.x or "level"
@@ -115,6 +122,7 @@ def emit_code(
                         "yerr": spec.yerr,
                         "weight": spec.weight,
                         "annotations": list(spec.annotations),
+                        "color_map": dict(spec.color_map),
                         "title": spec.title,
                         "xlabel": spec.xlabel,
                         "ylabel": spec.ylabel,
@@ -144,6 +152,7 @@ def emit_code(
             "@YERR@": _r(spec.yerr),
             "@WEIGHT@": _r(spec.weight),
             "@ANNOTATIONS@": ", ".join(_r(name) for name in spec.annotations),
+            "@COLOR_MAP@": _r_map(spec.color_map),
             "@TITLE@": _r(spec.title),
             "@XLABEL@": _r(spec.xlabel),
             "@YLABEL@": _r(spec.ylabel),

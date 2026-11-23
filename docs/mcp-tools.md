@@ -360,6 +360,7 @@ rather than being rasterised silently; too-small layouts raise `bad_layout`.
 | v1.5 | M1 completion | identifier resolution (Crossref/arXiv/PubMed/PMC/Unpaywall), PDF download, repository link + plotting-script discovery; ingest result gains `pdf_url`, `repository_urls`, `code_candidate_count`, request gains `with_code` |
 | v1.7 | design tiering | `ChartAssetSummary` gains `design_score` and `design_tier` (gold/dense/reject) |
 | v1.8 | usefulness | `ChartAssetSummary` gains `usefulness_score`; retrieval ranks by design × usefulness |
+| v2.5 | shared palette | `RenderRequest.color_map` (category → hex) for consistent annotation/node colours |
 | v2.4 | tree annotations | `RenderRequest.annotations` (multiple tip annotation columns) |
 | v2.3 | tree chart | `ChartType` gains `tree` (Newick edges → rectangular cladogram, both backends) |
 | v2.2 | network chart | `render_chart_from_data` gains `weight`; `ChartType` gains `network` (circular edge layout, both backends) |

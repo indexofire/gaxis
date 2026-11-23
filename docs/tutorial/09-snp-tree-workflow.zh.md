@@ -65,11 +65,14 @@ pixi run gaxis analysis run newick-to-table \
 pixi run gaxis render \
   --data data/analysis/<run_id>/tree_edges.csv \
   --chart tree --x parent --y child --weight branch_length \
-  --hue source --annotation amr_class --preset asm --out data/figures
+  --hue source --annotation amr_class \
+  --color-map data/analysis/<amr_run>/palette.json \
+  --preset asm --out data/figures
 ```
 
 矩形进化树；分支长度来自 `branch_length`，tip 标签自动放置；`--hue source` 与
-`--annotation amr_class` 在 tip 旁各画一条色带（`--annotation` 可重复）并生成合并图例。matplotlib 与 ggplot2 双后端。树本身仍由 IQ-TREE 生成，gaxis 只做布局与出图。
+`--annotation amr_class` 在 tip 旁各画一条色带（`--annotation` 可重复）并生成合并图例。传入 AMR 分析的 `palette.json` 作为
+`--color-map`，网络图与树图的 AMR 类别颜色保持一致。matplotlib 与 ggplot2 双后端。树本身仍由 IQ-TREE 生成，gaxis 只做布局与出图。
 
 ![带注释的树图示例](/gaxis/assets/example-tree.png)
 

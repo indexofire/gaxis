@@ -38,6 +38,7 @@ class ChartSpec(BaseModel):
     yerr: str | None = None
     weight: str | None = None
     annotations: list[str] = Field(default_factory=list)
+    color_map: dict[str, str] = Field(default_factory=dict)
     title: str | None = None
     xlabel: str | None = None
     ylabel: str | None = None

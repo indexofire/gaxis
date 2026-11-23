@@ -78,9 +78,20 @@ if (length(annotation_cols) > 0) {
   annotations <- annotations[!is.na(annotations$key) & !grepl(": NA$|: $", annotations$key), ]
   annotation_keys <- sort(unique(annotations$key))
   annotations$key <- factor(annotations$key, levels = annotation_keys)
-  annotation_colors <- setNames(
-    rep(COLORS, length.out = length(annotation_keys)), annotation_keys
-  )
+  annotation_values <- sub("^[^:]+: ", "", annotation_keys)
+  used_colors <- unique(unlist(SPEC$color_map))
+  fallback_colors <- setdiff(COLORS, used_colors)
+  if (length(fallback_colors) == 0) fallback_colors <- COLORS
+  annotation_colors <- c()
+  next_color <- 1
+  for (i in seq_along(annotation_keys)) {
+    mapped <- SPEC$color_map[[annotation_values[i]]]
+    if (is.null(mapped)) {
+      mapped <- fallback_colors[((next_color - 1) %% length(fallback_colors)) + 1]
+      next_color <- next_color + 1
+    }
+    annotation_colors[[annotation_keys[i]]] <- mapped
+  }
 }
 
 p <- ggplot() +

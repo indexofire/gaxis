@@ -61,6 +61,7 @@ def infer_spec(
     yerr: str | None = None,
     weight: str | None = None,
     annotations: list[str] | None = None,
+    color_map: dict[str, str] | None = None,
     preset: str = "default",
     palette: str | None = None,
     backend: str = "python",
@@ -95,6 +96,7 @@ def infer_spec(
         yerr=yerr,
         weight=weight,
         annotations=list(annotations or []),
+        color_map=dict(color_map or {}),
         title=title,
         xlabel=(
             None

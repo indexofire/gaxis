@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Shared category palette**: AMR analysis writes `palette.json` (class → hex);
+  `gaxis render --color-map palette.json` reuses it for network nodes and tree annotation strips,
+  so the same class keeps the same colour across figures. Contract v2.5.
 - **Multi-column tree annotation**: `RenderRequest.annotations` lets a tree figure draw one
   coloured strip per tip metadata column (`--annotation` repeatable) with a combined legend,
   in both backends; contract v2.4.

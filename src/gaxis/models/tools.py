@@ -1,4 +1,4 @@
-"""MCP tool contract v2.4 — frozen surface between the kernel and every host.
+"""MCP tool contract v2.5 — frozen surface between the kernel and every host.
 
 Seven tools, one core. Hosts (bacmap, DSH, Pi, Hermes, CLI) only translate; the
 kernel never learns about a host SDK (ADR-05). Every tool declares its data
@@ -53,6 +53,7 @@ class RenderRequest(BaseModel):
     yerr: str | None = None
     weight: str | None = None
     annotations: list[str] = Field(default_factory=list)
+    color_map: dict[str, str] = Field(default_factory=dict)
     title: str | None = None
     xlabel: str | None = None
     ylabel: str | None = None
@@ -78,6 +79,7 @@ class RenderRequest(BaseModel):
             yerr=self.yerr,
             weight=self.weight,
             annotations=list(self.annotations),
+            color_map=dict(self.color_map),
             title=self.title,
             xlabel=self.xlabel,
             ylabel=self.ylabel,

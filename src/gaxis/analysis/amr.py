@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import itertools
+import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -22,6 +23,7 @@ from typing import Any
 from .. import __version__
 from ..errors import GaxisError
 from ..models.analysis import AmrCooccurrenceParams, AnalysisRun
+from ..style.palettes import get_palette
 
 RECIPE_AMR = {
     "id": "amr-cooccurrence",
@@ -130,6 +132,8 @@ def run_amr_cooccurrence(
                 "weight": round(weight, 6),
                 "support": both,
                 "jaccard": round(jaccard, 6),
+                "source_class": gene_class.get(left, ""),
+                "target_class": gene_class.get(right, ""),
             }
         )
     if not edges:
@@ -162,10 +166,25 @@ def run_amr_cooccurrence(
     edges_path = target / "edges.csv"
     with edges_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
-            handle, fieldnames=["source", "target", "weight", "support", "jaccard"]
+            handle,
+            fieldnames=[
+                "source",
+                "target",
+                "weight",
+                "support",
+                "jaccard",
+                "source_class",
+                "target_class",
+            ],
         )
         writer.writeheader()
         writer.writerows(edges)
+
+    palette = get_palette("okabe_ito").colors
+    classes = sorted({value for value in gene_class.values() if value})
+    palette_path = target / "palette.json"
+    palette_map = {name: palette[index % len(palette)] for index, name in enumerate(classes)}
+    palette_path.write_text(json.dumps(palette_map, indent=2) + "\n", encoding="utf-8")
 
     run = AnalysisRun(
         run_id=run_id,
@@ -176,7 +195,11 @@ def run_amr_cooccurrence(
         samples=len(samples),
         genes=len(genes),
         edges=len(edges),
-        outputs={"nodes": str(nodes_path), "edges": str(edges_path)},
+        outputs={
+            "nodes": str(nodes_path),
+            "edges": str(edges_path),
+            "palette": str(palette_path),
+        },
         tool=f"gaxis {__version__}",
     )
     (target / "analysis.json").write_text(run.model_dump_json(indent=2), encoding="utf-8")

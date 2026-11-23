@@ -806,6 +806,7 @@ def render(request: RenderRequest, *, execute: bool = True) -> RenderResult:
         yerr=request.yerr,
         weight=request.weight,
         annotations=list(request.annotations),
+        color_map=dict(request.color_map),
         title=request.title,
         xlabel=request.xlabel,
         ylabel=request.ylabel,

@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.4) with data classes."""
+    """Print the frozen MCP tool contract (v2.5) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -698,6 +698,9 @@ def render_cmd(
     annotation: list[str] | None = typer.Option(
         None, "--annotation", help="tree tip annotation column (repeatable)"
     ),
+    color_map: Path | None = typer.Option(
+        None, "--color-map", help="JSON object mapping category -> hex colour"
+    ),
     backend: str = typer.Option("python", "--backend", help="python (matplotlib) or r (ggplot2)"),
     preset: str = typer.Option("default", "--preset", "-p"),
     palette: str | None = typer.Option(None, "--palette"),
@@ -726,6 +729,7 @@ def render_cmd(
         yerr=yerr,
         weight=weight,
         annotations=annotation or [],
+        color_map=(json.loads(color_map.read_text(encoding="utf-8")) if color_map else {}),
         preset=preset,
         palette=palette,
         backend=backend,  # type: ignore[arg-type]
@@ -1052,7 +1056,8 @@ def analysis_run_cmd(
     if run.recipe == "amr-cooccurrence":
         typer.echo(
             "next:    gaxis render --chart network --data "
-            f"{run.outputs['edges']} --x source --y target --weight weight"
+            f"{run.outputs['edges']} --x source --y target --weight weight "
+            f"--color-map {run.outputs['palette']}"
         )
     elif run.recipe == "newick-to-table":
         typer.echo(

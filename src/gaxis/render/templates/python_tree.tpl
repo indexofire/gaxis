@@ -92,7 +92,19 @@ keys = sorted(
         if value
     }
 )
-key_color = {key: COLORS[index % len(COLORS)] for index, key in enumerate(keys)}
+color_map = SPEC.get("color_map", {})
+used = set(color_map.values())
+fallback = [color for color in COLORS if color not in used] or list(COLORS)
+key_color = {}
+next_index = 0
+for key in keys:
+    value = key.split(": ", 1)[-1]
+    mapped = color_map.get(value)
+    if mapped:
+        key_color[key] = mapped
+    else:
+        key_color[key] = fallback[next_index % len(fallback)]
+        next_index += 1
 
 offset = 0.015
 strip_width = 0.03

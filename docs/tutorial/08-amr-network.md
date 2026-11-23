@@ -50,10 +50,13 @@ Edges are pairs whose shared-sample support is at least `--min-support` and whos
 pixi run gaxis render \
   --data data/analysis/<run_id>/edges.csv \
   --chart network --x source --y target --weight weight \
+  --color-map data/analysis/<run_id>/palette.json \
   --preset asm --out data/figures
 ```
 
 - circular layout, edge width/alpha from `weight`, node size from degree;
+- node colours come from `palette.json` (one colour per gene class), which the same
+  `--color-map` can reuse for a tree or other figure;
 - both matplotlib and ggplot2 (same data contract);
 - output is the usual deliverable: `figure.py` / `figure.R`, PDF/SVG/PNG/TIFF, lint, manifest.
 

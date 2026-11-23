@@ -25,7 +25,7 @@ Profile a table: column types, cardinality, unit hints, recommended chart types.
 | Option | Description |
 |---|---|
 | `--chart {bar,stacked_bar,line,scatter,box,heatmap,network,tree}` | Chart type (inferred; network/tree must be explicit) |
-| `--x/--y/--hue/--yerr/--weight/--annotation` | Encoded column names (network: source/target/weight; tree: parent/child/branch) |
+| `--x/--y/--hue/--yerr/--weight/--annotation/--color-map` | Encoded columns; `--color-map` is a JSON category→hex map (shared across figures) |
 | `--backend python\|r` | matplotlib or ggplot2 |
 | `--preset NAME` | Journal preset (default `default`) |
 | `--palette NAME` | Override the preset palette |

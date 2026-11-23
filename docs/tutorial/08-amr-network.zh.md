@@ -48,10 +48,12 @@ data/analysis/<run_id>/
 pixi run gaxis render \
   --data data/analysis/<run_id>/edges.csv \
   --chart network --x source --y target --weight weight \
+  --color-map data/analysis/<run_id>/palette.json \
   --preset asm --out data/figures
 ```
 
 - 环形布局；边宽/透明度由 `weight` 决定，节点大小由度数决定；
+- 节点颜色来自 `palette.json`（每个 gene class 一个颜色），同一 `--color-map` 可复用于树图等；
 - matplotlib 与 ggplot2 双后端（同一数据契约）；
 - 产物仍是标准交付：`figure.py` / `figure.R`、PDF/SVG/PNG/TIFF、lint、manifest。
 

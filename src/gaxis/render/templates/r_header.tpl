@@ -32,6 +32,7 @@ SPEC <- list(
   yerr = @YERR@,
   weight = @WEIGHT@,
   annotations = c(@ANNOTATIONS@),
+  color_map = @COLOR_MAP@,
   title = @TITLE@,
   xlabel = @XLABEL@,
   ylabel = @YLABEL@,
