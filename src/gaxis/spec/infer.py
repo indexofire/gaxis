@@ -60,6 +60,7 @@ def infer_spec(
     hue: str | None = None,
     yerr: str | None = None,
     weight: str | None = None,
+    annotations: list[str] | None = None,
     preset: str = "default",
     palette: str | None = None,
     backend: str = "python",
@@ -93,6 +94,7 @@ def infer_spec(
         hue=hue_col,
         yerr=yerr,
         weight=weight,
+        annotations=list(annotations or []),
         title=title,
         xlabel=(
             None

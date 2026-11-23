@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Multi-column tree annotation**: `RenderRequest.annotations` lets a tree figure draw one
+  coloured strip per tip metadata column (`--annotation` repeatable) with a combined legend,
+  in both backends; contract v2.4.
 - **Tree annotation**: `newick-to-table --metadata` joins a tip metadata table onto the tree
   (key: tip/sample/id/name/genome/strain/isolate; missing tips listed in `metadata_missing.txt`);
   `gaxis render --chart tree ... --hue source` draws a coloured tip band + legend in both backends.

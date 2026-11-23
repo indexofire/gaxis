@@ -104,3 +104,30 @@ def test_metadata_rejects_an_empty_table(tmp_path: Path) -> None:
     with pytest.raises(GaxisError) as excinfo:
         run_newick_to_table(tree, out_dir=tmp_path / "out", metadata_path=metadata)
     assert excinfo.value.code == "empty_input"
+
+
+def test_multiple_annotation_columns_render_in_both_backends(tmp_path: Path) -> None:
+    metadata = tmp_path / "meta.csv"
+    metadata.write_text(
+        "tip,source,amr_class\nA,human,beta-lactam\nB,swine,beta-lactam\n"
+        "C,human,tetracycline\nD,swine,tetracycline\n",
+        encoding="utf-8",
+    )
+    edges = _edges(tmp_path, metadata)
+    for backend in ("python", "r"):
+        result = render(
+            RenderRequest(
+                data_path=str(edges),
+                out_dir=str(tmp_path / f"multi-{backend}"),
+                chart_type="tree",
+                x="parent",
+                y="child",
+                weight="branch_length",
+                hue="source",
+                annotations=["amr_class"],
+                preset="asm",
+                backend=backend,  # type: ignore[arg-type]
+                formats=["pdf", "png"],
+            )
+        )
+        assert result.lint.ok, result.lint.format_text()

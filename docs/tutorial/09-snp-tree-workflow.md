@@ -66,12 +66,13 @@ pixi run gaxis analysis run newick-to-table \
 
 pixi run gaxis render \
   --data data/analysis/<run_id>/tree_edges.csv \
-  --chart tree --x parent --y child --weight branch_length --hue source \
-  --preset asm --out data/figures
+  --chart tree --x parent --y child --weight branch_length \
+  --hue source --annotation amr_class --preset asm --out data/figures
 ```
 
-Rectangular cladogram, branch lengths from `branch_length`, tip labels, and a colour band
-per tip from `--hue` (`source` in this example) with a legend. matplotlib and ggplot2 both
+Rectangular cladogram, branch lengths from `branch_length`, tip labels, and one coloured strip
+per annotation column (`--hue source` plus `--annotation amr_class`; repeat `--annotation` for
+more) with a combined legend. matplotlib and ggplot2 both
 render it. The tree itself still comes from IQ-TREE, not gaxis.
 
 ![Annotated tree example](/gaxis/assets/example-tree.png)

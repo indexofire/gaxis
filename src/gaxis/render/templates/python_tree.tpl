@@ -69,47 +69,48 @@ for parent, child, _length in edges:
     ax.plot([x0, x1], [y0, y0], color="black", linewidth=line_width)
     ax.plot([x1, x1], [y0, y1], color="black", linewidth=line_width)
 
-hue = SPEC["hue"]
-tip_meta = {}
-if hue:
-    for row in rows:
-        child = row.get(SPEC["y"], "")
-        value = row.get(hue, "")
-        if child in positions and value not in MISSING:
-            tip_meta[child] = value
-    groups = sorted(set(tip_meta.values()))
-    group_color = {group: COLORS[index % len(COLORS)] for index, group in enumerate(groups)}
-    from matplotlib.patches import Patch
+annotation_columns = []
+for column in ([SPEC["hue"]] if SPEC["hue"] else []) + list(SPEC.get("annotations", [])):
+    if column and column not in annotation_columns:
+        annotation_columns.append(column)
 
-    ax.legend(
-        handles=[
-            Patch(facecolor=group_color[group], label=group) for group in groups
-        ],
-        title=hue,
-        loc="upper left",
-        bbox_to_anchor=(1.01, 1.0),
-        borderaxespad=0.0,
-        frameon=False,
-        fontsize=float(matplotlib.rcParams["font.size"]) * 0.85,
-        title_fontsize=float(matplotlib.rcParams["font.size"]) * 0.85,
-    )
+tip_annotations = {tip: {} for tip in order}
+for row in rows:
+    child = row.get(SPEC["y"], "")
+    if child not in positions:
+        continue
+    for column in annotation_columns:
+        value = row.get(column, "")
+        if value not in MISSING:
+            tip_annotations[child][column] = value
+
+keys = sorted(
+    {
+        f"{column}: {value}"
+        for column in annotation_columns
+        for value in {tip_annotations[tip].get(column, "") for tip in order}
+        if value
+    }
+)
+key_color = {key: COLORS[index % len(COLORS)] for index, key in enumerate(keys)}
 
 offset = 0.015
+strip_width = 0.03
 for tip in order:
     x = depth[tip] / span
     y = positions[tip]
-    if hue and tip in tip_meta:
-        ax.scatter(
-            [x + offset],
-            [y],
-            marker="s",
-            s=18,
-            color=group_color[tip_meta[tip]],
-            zorder=3,
-        )
-        label_x = x + 0.045
-    else:
-        label_x = x + offset
+    for index, column in enumerate(annotation_columns):
+        value = tip_annotations[tip].get(column, "")
+        if value:
+            ax.scatter(
+                [x + offset + index * strip_width],
+                [y],
+                marker="s",
+                s=18,
+                color=key_color[f"{column}: {value}"],
+                zorder=3,
+            )
+    label_x = x + offset + len(annotation_columns) * strip_width + 0.01
     ax.text(
         label_x,
         y,
@@ -118,6 +119,21 @@ for tip in order:
         va="center",
         fontsize=float(matplotlib.rcParams["font.size"]) * 0.9,
     )
+
+if keys:
+    from matplotlib.patches import Patch
+
+    ax.legend(
+        handles=[Patch(facecolor=key_color[key], label=key) for key in keys],
+        title="annotation",
+        loc="upper left",
+        bbox_to_anchor=(1.01, 1.0),
+        borderaxespad=0.0,
+        frameon=False,
+        fontsize=float(matplotlib.rcParams["font.size"]) * 0.8,
+        title_fontsize=float(matplotlib.rcParams["font.size"]) * 0.8,
+    )
+
 ax.set_xlim(0, 1.15)
 ax.set_ylim(-0.8, len(order) - 0.2)
 ax.axis("off")

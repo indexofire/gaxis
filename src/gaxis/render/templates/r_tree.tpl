@@ -49,14 +49,39 @@ x1 <- depth[edges$child] / span
 y1 <- ypos[edges$child]
 horizontal <- data.frame(x = x0, y = y0, xend = x1, yend = y0)
 vertical <- data.frame(x = x1, y = y0, xend = x1, yend = y1)
+annotation_cols <- unique(c(
+  if (is.null(SPEC$hue)) character(0) else SPEC$hue,
+  if (is.null(SPEC$annotations)) character(0) else SPEC$annotations
+))
+tip_idx <- which(edges$is_tip == 1)
+base_x <- x1[tip_idx]
+tip_y <- y1[tip_idx]
+tip_label <- edges$child[tip_idx]
 labels <- data.frame(
-  x = x1 + if (is.null(SPEC$hue)) 0.015 else 0.035,
-  y = y1,
-  label = edges$child,
-  group = edges$group,
-  is_tip = edges$is_tip
+  x = base_x + 0.015 + length(annotation_cols) * 0.03 + 0.01,
+  y = tip_y,
+  label = tip_label
 )
-labels <- labels[labels$is_tip == 1, , drop = FALSE]
+annotations <- data.frame()
+if (length(annotation_cols) > 0) {
+  for (i in seq_along(annotation_cols)) {
+    values <- as.character(raw[[annotation_cols[i]]])[tip_idx]
+    annotations <- rbind(
+      annotations,
+      data.frame(
+        x = base_x + 0.015 + (i - 1) * 0.03,
+        y = tip_y,
+        key = paste0(annotation_cols[i], ": ", values)
+      )
+    )
+  }
+  annotations <- annotations[!is.na(annotations$key) & !grepl(": NA$|: $", annotations$key), ]
+  annotation_keys <- sort(unique(annotations$key))
+  annotations$key <- factor(annotations$key, levels = annotation_keys)
+  annotation_colors <- setNames(
+    rep(COLORS, length.out = length(annotation_keys)), annotation_keys
+  )
+}
 
 p <- ggplot() +
   geom_segment(data = horizontal, aes(x = x, y = y, xend = xend, yend = yend),
@@ -65,16 +90,16 @@ p <- ggplot() +
                linewidth = pt_to_lwd(LINE_WIDTH), colour = "black") +
   geom_text(data = labels, aes(x = x, y = y, label = label),
             hjust = 0, size = BASE_PT / .pt, family = FONT_FAMILY) +
-  { if (is.null(SPEC$hue)) NULL else
+  { if (nrow(annotations) == 0) NULL else
       list(
-        geom_point(data = labels, aes(x = x - 0.02, y = y, colour = group),
+        geom_point(data = annotations, aes(x = x, y = y, colour = key),
                    shape = 15, size = 1.6),
-        scale_colour_manual(values = COLORS, name = SPEC$hue),
+        scale_colour_manual(values = annotation_colors, name = "annotation"),
         theme(legend.position = "right",
               legend.title = element_text(size = BASE_PT),
               legend.text = element_text(size = BASE_PT))
       ) } +
-  coord_cartesian(xlim = c(0, 1.15), ylim = c(-0.8, nrow(labels) - 0.2), clip = "off") +
+  coord_cartesian(xlim = c(0, 1.25), ylim = c(-0.8, nrow(labels) - 0.2), clip = "off") +
   theme_void(base_size = BASE_PT, base_family = FONT_FAMILY) +
   theme(plot.title = element_text(size = TITLE_PT, hjust = 0),
         plot.margin = margin(2, 2, 2, 2, unit = "mm"))

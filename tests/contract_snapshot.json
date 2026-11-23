@@ -1,5 +1,5 @@
 {
-  "contract_version": "v2.3",
+  "contract_version": "v2.4",
   "tools": {
     "adapt_chart_code": {
       "data_class": "D3",
@@ -142,6 +142,7 @@
       "data_class": "D3",
       "inputs": [
         "annotate_values",
+        "annotations",
         "backend",
         "chart_type",
         "data_path",

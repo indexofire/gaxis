@@ -804,6 +804,8 @@ def render(request: RenderRequest, *, execute: bool = True) -> RenderResult:
         y=request.y,
         hue=request.hue,
         yerr=request.yerr,
+        weight=request.weight,
+        annotations=list(request.annotations),
         title=request.title,
         xlabel=request.xlabel,
         ylabel=request.ylabel,
@@ -844,6 +846,13 @@ def validate(spec: ChartSpec, schema: DataSchema) -> None:
             raise GaxisError(
                 "unknown_column",
                 f"{field} column '{name}' is not in the table",
+                hint=f"available columns: {available}",
+            )
+    for column in spec.annotations:
+        if not schema.has(column):
+            raise GaxisError(
+                "unknown_column",
+                f"annotation column '{column}' is not in the table",
                 hint=f"available columns: {available}",
             )
     if spec.x is None:

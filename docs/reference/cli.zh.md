@@ -25,7 +25,7 @@
 | 选项 | 说明 |
 |---|---|
 | `--chart {bar,stacked_bar,line,scatter,box,heatmap,network,tree}` | 图型（默认由数据推断；network/tree 需显式指定） |
-| `--x/--y/--hue/--yerr/--weight` | 编码列名（network：source/target/weight；tree：parent/child/branch） |
+| `--x/--y/--hue/--yerr/--weight/--annotation` | 编码列名（network：source/target/weight；tree：parent/child/branch） |
 | `--backend python\|r` | matplotlib 或 ggplot2 |
 | `--preset NAME` | 期刊预设（默认 `default`） |
 | `--palette NAME` | 覆盖预设调色板 |

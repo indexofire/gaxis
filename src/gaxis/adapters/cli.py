@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.3) with data classes."""
+    """Print the frozen MCP tool contract (v2.4) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -695,6 +695,9 @@ def render_cmd(
     hue: str | None = typer.Option(None, "--hue"),
     yerr: str | None = typer.Option(None, "--yerr"),
     weight: str | None = typer.Option(None, "--weight", help="edge weight column (network)"),
+    annotation: list[str] | None = typer.Option(
+        None, "--annotation", help="tree tip annotation column (repeatable)"
+    ),
     backend: str = typer.Option("python", "--backend", help="python (matplotlib) or r (ggplot2)"),
     preset: str = typer.Option("default", "--preset", "-p"),
     palette: str | None = typer.Option(None, "--palette"),
@@ -722,6 +725,7 @@ def render_cmd(
         hue=hue,
         yerr=yerr,
         weight=weight,
+        annotations=annotation or [],
         preset=preset,
         palette=palette,
         backend=backend,  # type: ignore[arg-type]
