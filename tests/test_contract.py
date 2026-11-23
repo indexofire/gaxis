@@ -4,7 +4,7 @@ from pathlib import Path
 from gaxis.models.tools import TOOL_SPECS
 
 SNAPSHOT = Path(__file__).parent / "contract_snapshot.json"
-CONTRACT_VERSION = "v2.7"
+CONTRACT_VERSION = "v2.8"
 EXPECTED_TOOLS = {
     "describe_data_schema",
     "render_chart_from_data",

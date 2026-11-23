@@ -38,5 +38,6 @@ class FigureManifest(BaseModel):
     lint: LintReport = Field(default_factory=LintReport)
     source: FigureSource = "builtin_templates"
     recipe_id: str | None = None
+    analysis_run_id: str | None = None
     asset_ids: list[str] = Field(default_factory=list)
     generator: str = f"gaxis {__version__}"

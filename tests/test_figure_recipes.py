@@ -80,3 +80,35 @@ def test_recipe_render_honours_rotate_labels(tmp_path: Path) -> None:
     )
     code = Path(result.code_path).read_text(encoding="utf-8")
     assert "'rotate_labels': 90" in code or '"rotate_labels": 90' in code
+
+
+def test_recipe_can_run_its_analysis_recipe(tmp_path: Path) -> None:
+    table = tmp_path / "amr.csv"
+    table.write_text(
+        "sample,gene,gene_class\n"
+        "S1,blaCTX-M,beta-lactam\nS1,sul1,sulfonamide\n"
+        "S2,blaCTX-M,beta-lactam\nS2,sul1,sulfonamide\n"
+        "S3,blaCTX-M,beta-lactam\nS3,sul1,sulfonamide\n",
+        encoding="utf-8",
+    )
+    result = render_figure_recipe(
+        RenderFigureRecipeRequest(
+            recipe_id="amr-network",
+            data_path=str(table),
+            out_dir=str(tmp_path / "figures"),
+            run_analysis=True,
+        )
+    )
+    assert result.analysis_run_id
+    assert result.manifest["analysis_run_id"] == result.analysis_run_id
+    assert result.lint.ok, result.lint.format_text()
+
+
+def test_recipe_without_analysis_rejects_run_analysis(tmp_path: Path) -> None:
+    table = tmp_path / "edges.csv"
+    table.write_text("parent,child,branch_length\nA,B,1\n", encoding="utf-8")
+    with pytest.raises(GaxisError) as excinfo:
+        render_figure_recipe(
+            RenderFigureRecipeRequest(recipe_id="snp-tree", data_path=str(table), run_analysis=True)
+        )
+    assert excinfo.value.code == "analysis_not_supported"

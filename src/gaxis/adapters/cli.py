@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.7) with data classes."""
+    """Print the frozen MCP tool contract (v2.8) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -1103,12 +1103,30 @@ def recipe_render(
     preset: str | None = typer.Option(None, "--preset", "-p"),
     color_map: Path | None = typer.Option(None, "--color-map"),
     out: Path | None = typer.Option(None, "--out"),
+    run_analysis: bool = typer.Option(
+        False,
+        "--run-analysis",
+        help="treat --data as the analysis input and run the recipe's analysis",
+    ),
+    analysis_param: list[str] | None = typer.Option(
+        None, "--analysis-param", help="key=value override for the analysis recipe (repeatable)"
+    ),
     dry_run: bool = typer.Option(False, "--dry-run"),
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     """Render a curated recipe after checking its required columns."""
     from ..models.recipe import RenderFigureRecipeRequest
 
+    params: dict[str, Any] = {}
+    for item in analysis_param or []:
+        key, separator, raw = item.partition("=")
+        if not separator:
+            _fail(GaxisError("bad_parameter", f"expected key=value, got {item!r}"))
+            return
+        try:
+            params[key.strip()] = float(raw) if "." in raw else int(raw)
+        except ValueError:
+            params[key.strip()] = raw.strip()
     try:
         result = service.render_figure_recipe(
             RenderFigureRecipeRequest(
@@ -1117,6 +1135,8 @@ def recipe_render(
                 preset=preset,
                 out_dir=str(out) if out else None,
                 color_map=(json.loads(color_map.read_text(encoding="utf-8")) if color_map else {}),
+                run_analysis=run_analysis,
+                analysis_params=params,
                 dry_run=dry_run,
             )
         )

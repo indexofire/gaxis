@@ -219,7 +219,7 @@ Fonts resolve through `matplotlib.font_manager` with an explicit fallback chain
 Liberation Sans is the resolved metric-compatible Arial substitute; if a fallback happens, lint
 L005 reports it.
 
-## 6. Tool contract v2.7
+## 6. Tool contract v2.8
 
 Twelve tools, all declared in `models/tools.py` with exported JSON Schemas, data class, side effects,
 network need, cost and milestone. Reference: `docs/mcp-tools.md`. Frozen by

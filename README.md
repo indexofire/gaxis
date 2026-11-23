@@ -34,7 +34,7 @@ Two surfaces over one core:
   `integrations/bacmap_export.py` turns a bacmap results run into the required tables;
 - curated recipes via `gaxis recipe list/render` (same contracts as the MCP tools);
 - operations: checkpointed ingest/reproduce queue, retries, stall reclaim, heartbeat, `ops verify`;
-- surfaces: CLI and MCP server (twelve tools, contract v2.7) + typed client + bacmap adapter.
+- surfaces: CLI and MCP server (twelve tools, contract v2.8) + typed client + bacmap adapter.
 
 M5 host adapters beyond CLI/bacmap and the deeper M6 self-healing layers are still in progress;
 known limits are listed in [CHANGELOG.md](CHANGELOG.md#known-limits-in-010).

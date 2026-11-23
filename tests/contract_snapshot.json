@@ -1,5 +1,5 @@
 {
-  "contract_version": "v2.7",
+  "contract_version": "v2.8",
   "tools": {
     "adapt_chart_code": {
       "data_class": "D3",
@@ -190,14 +190,17 @@
     "render_figure_recipe": {
       "data_class": "D3",
       "inputs": [
+        "analysis_params",
         "color_map",
         "data_path",
         "dry_run",
         "out_dir",
         "preset",
-        "recipe_id"
+        "recipe_id",
+        "run_analysis"
       ],
       "outputs": [
+        "analysis_run_id",
         "code_path",
         "figure_id",
         "lint",

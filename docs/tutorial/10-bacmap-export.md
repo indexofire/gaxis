@@ -24,6 +24,20 @@ data/bacmap-export/export.json    samples, amr_rows, sources
 The reference adapter is ~100 lines, stdlib only, and imports neither bacmap nor gaxis. In
 bacmap, the same tables can be produced by its own result/query tools; the contract is the CSV.
 
+## One call (optional)
+
+If you have the long AMR table, `--run-analysis` runs the recipe's analysis first:
+
+```bash
+pixi run gaxis recipe render amr-network \
+  --data data/bacmap-export/amr_long.csv --run-analysis \
+  --analysis-param min_prevalence=0.3 --analysis-param min_support=2 \
+  --out data/figures
+```
+
+The manifest records both `recipe_id` and `analysis_run_id`. bacmap can still precompute the
+tables and call `recipe render` without `--run-analysis`.
+
 ## Analyse and render
 
 ```bash

@@ -1508,7 +1508,33 @@ def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureReci
             f"unknown figure recipe {request.recipe_id!r}",
             hint="call list_figure_recipes",
         )
-    schema = describe_data(request.data_path)
+    analysis_run_id: str | None = None
+    data_path = Path(request.data_path)
+    if request.run_analysis:
+        if not recipe.analysis_recipe or not recipe.analysis_output:
+            raise GaxisError(
+                "analysis_not_supported",
+                f"{recipe.recipe_id} has no analysis recipe",
+                hint="pass an already analysed table instead",
+            )
+        params = {**recipe.analysis_params, **request.analysis_params}
+        try:
+            analysis = analysis_run(
+                recipe.analysis_recipe,
+                input_path=data_path,
+                params=AmrCooccurrenceParams(**params),
+            )
+        except TypeError as exc:
+            raise GaxisError("bad_parameter", f"analysis params: {exc}") from exc
+        output = analysis.outputs.get(recipe.analysis_output)
+        if not output:
+            raise GaxisError(
+                "analysis_output_missing",
+                f"analysis did not produce {recipe.analysis_output!r}",
+            )
+        data_path = Path(output)
+        analysis_run_id = analysis.run_id
+    schema = describe_data(str(data_path))
     missing = [name for name in recipe.required_columns if not schema.has(name)]
     if missing:
         raise GaxisError(
@@ -1539,6 +1565,7 @@ def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureReci
         execute=not request.dry_run,
     )
     result.manifest.recipe_id = recipe.recipe_id
+    result.manifest.analysis_run_id = analysis_run_id
     if result.manifest_path:
         Path(result.manifest_path).write_text(
             result.manifest.model_dump_json(indent=2), encoding="utf-8"
@@ -1551,6 +1578,7 @@ def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureReci
         lint=result.lint,
         manifest=json.loads(result.manifest.model_dump_json()),
         source="figure_recipe",
+        analysis_run_id=analysis_run_id,
         not_implemented=False,
     )
 

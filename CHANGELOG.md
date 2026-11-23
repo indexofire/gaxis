@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Recipe-driven analysis**: `recipe render --run-analysis` / `render_figure_recipe(run_analysis=true)`
+  runs the recipe's associated analysis (`amr-cooccurrence`) first and records `analysis_run_id`
+  in the manifest; analysis params are overridable per call. Contract v2.8.
 - **Recipe CLI + rotated labels**: `gaxis recipe list/render` (same contracts as MCP);
   `--rotate-labels` (0–90°) for long categorical labels, used by the AMR prevalence recipe;
   contract v2.7. Tutorial 10 adds a two-panel network + prevalence composition.

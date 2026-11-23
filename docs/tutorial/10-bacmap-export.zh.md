@@ -24,6 +24,20 @@ data/bacmap-export/export.json    samples、amr_rows、来源
 参考适配器约 100 行，只用标准库，不 import bacmap 或 gaxis。bacmap 内部也可以用其 query/result 工具
 生成同样的表；契约就是这两个 CSV。
 
+## 一步完成（可选）
+
+如果手上是长表，`--run-analysis` 会先跑 recipe 关联的分析：
+
+```bash
+pixi run gaxis recipe render amr-network \
+  --data data/bacmap-export/amr_long.csv --run-analysis \
+  --analysis-param min_prevalence=0.3 --analysis-param min_support=2 \
+  --out data/figures
+```
+
+manifest 会同时记录 `recipe_id` 与 `analysis_run_id`。bacmap 仍可以先算好表，再不带
+`--run-analysis` 调用。
+
 ## 分析与出图
 
 ```bash

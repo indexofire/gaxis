@@ -12,6 +12,9 @@ weight = "weight"
 preset = "asm"
 required = ["source", "target", "weight"]
 optional = ["source_class", "target_class", "support", "jaccard"]
+analysis = "amr-cooccurrence"
+analysis_output = "edges"
+analysis_params = { min_prevalence = 0.05, min_support = 2 }
 
 [[recipe]]
 id = "amr-prevalence-bar"
@@ -25,6 +28,9 @@ preset = "asm"
 rotate_labels = 90
 required = ["gene", "prevalence"]
 optional = ["gene_class", "samples"]
+analysis = "amr-cooccurrence"
+analysis_output = "nodes"
+analysis_params = { min_prevalence = 0.05, min_support = 2 }
 
 [[recipe]]
 id = "snp-tree"

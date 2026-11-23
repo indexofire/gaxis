@@ -23,6 +23,9 @@ class FigureRecipe(BaseModel):
     annotations: list[str] = Field(default_factory=list)
     preset: str = "default"
     rotate_labels: int = 0
+    analysis_recipe: str | None = None
+    analysis_output: str | None = None
+    analysis_params: dict[str, Any] = Field(default_factory=dict)
     required_columns: list[str] = Field(default_factory=list)
     optional_columns: list[str] = Field(default_factory=list)
 
@@ -42,6 +45,8 @@ class RenderFigureRecipeRequest(BaseModel):
     preset: str | None = None
     out_dir: str | None = None
     color_map: dict[str, str] = Field(default_factory=dict)
+    run_analysis: bool = False
+    analysis_params: dict[str, Any] = Field(default_factory=dict)
     dry_run: bool = False
 
 
@@ -53,4 +58,5 @@ class RenderFigureRecipeResult(BaseModel):
     lint: LintReport = Field(default_factory=LintReport)
     manifest: dict[str, Any] = Field(default_factory=dict)
     source: Literal["figure_recipe"] = "figure_recipe"
+    analysis_run_id: str | None = None
     not_implemented: bool = False
