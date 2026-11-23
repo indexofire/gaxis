@@ -31,6 +31,7 @@ Two surfaces over one core:
   multi-panel `compose` (with `--uniform`);
 - analysis recipes on bacmap tables: `gaxis analysis run amr-cooccurrence` computes gene
   co-occurrence (no AMR re-calling) and `--chart network` renders it in both backends;
+  `integrations/bacmap_export.py` turns a bacmap results run into the required tables;
 - operations: checkpointed ingest/reproduce queue, retries, stall reclaim, heartbeat, `ops verify`;
 - surfaces: CLI and MCP server (ten tools, contract v2.1) + typed client + bacmap adapter.
 

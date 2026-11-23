@@ -12,6 +12,7 @@
 | [06 运维](06-operations.zh.md) | 自动入库队列、定时任务、自愈检查 | 是 | 是 |
 | [08 AMR 共现网络](08-amr-network.zh.md) | 表 → 共现边 → 画网络图，不重跑 AMR | 否 | 否 |
 | [09 SNP 树工作流](09-snp-tree-workflow.zh.md) | Snakemake 脚手架/校验、Newick 转换、带注释的树图 | 否 | 否 |
+| [10 bacmap 结果 → 网络图](10-bacmap-export.zh.md) | 真实 bacmap AMR 表 → 共现网络，不重跑调用 | 否 | 否 |
 
 ## 建议的练习顺序
 

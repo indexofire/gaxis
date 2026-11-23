@@ -113,8 +113,9 @@ if groups:
             for group in groups
         ],
         title="class",
-        loc="upper left",
-        bbox_to_anchor=(1.01, 1.0),
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.0),
+        ncol=2,
         borderaxespad=0.0,
         frameon=False,
         fontsize=float(matplotlib.rcParams["font.size"]) * 0.8,
@@ -132,7 +133,7 @@ for node in order:
     )
 ax.set_aspect("equal")
 ax.set_xlim(-1.4, 1.4)
-ax.set_ylim(-1.4, 1.4)
+ax.set_ylim(-2.2, 1.4)
 ax.axis("off")
 # Keep the journal page size: a circular layout has empty corners, so the
 # globally-tight bbox would silently shrink the delivered PDF.

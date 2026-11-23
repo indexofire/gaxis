@@ -137,3 +137,29 @@ pixi run pytest -q tests/test_mcp.py tests/test_bacmap_upstream.py
 They spawn a real Streamable-HTTP server on loopback, enforce auth, render a figure over MCP, and
 assert the profile gating, naming, JSON-string results and error mapping. If you change the adapter,
 these are the tests that must stay green.
+
+
+## Figure handoff: bacmap results → gaxis
+
+bacmap already holds AMR calls, species, serotype and typing. gaxis does not re-run those tools; it
+consumes an exported table and produces the figure/evidence.
+
+The reference exporter is `integrations/bacmap_export.py` (stdlib only; imports neither project):
+
+```bash
+python integrations/bacmap_export.py --run-dir <bacmap results run> --out data/bacmap-export
+# amr_long.csv: sample,gene,gene_class
+# metadata.csv: sample,species,serotype
+```
+
+Then:
+
+```bash
+gaxis analysis run amr-cooccurrence --input data/bacmap-export/amr_long.csv --out data/analysis
+gaxis render --chart network --data data/analysis/<run>/edges.csv \
+  --x source --y target --weight weight --color-map data/analysis/<run>/palette.json --preset asm
+```
+
+The same table contract can be produced by a bacmap query/result tool; the important boundary is
+that **only tables cross the boundary**, not raw reads or the database. See tutorial 10 for a real
+run (20 Salmonellae, 121 AMR rows → 9-gene/20-edge figure).

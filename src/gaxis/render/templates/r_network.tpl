@@ -88,7 +88,11 @@ p <- ggplot() +
                  shape = 21, colour = "white", stroke = pt_to_lwd(0.4))
     } } +
   { if (length(groups) == 0) NULL else
-      scale_fill_manual(values = group_colors, name = "class") } +
+      list(
+        scale_fill_manual(values = group_colors, name = "class"),
+        guides(fill = guide_legend(ncol = 2)),
+        theme(legend.position = "bottom")
+      ) } +
   geom_text(
     data = pos,
     aes(x = x * 1.14, y = y * 1.14, label = node),
@@ -99,7 +103,7 @@ p <- ggplot() +
   scale_linewidth_identity() +
   scale_alpha_identity() +
   scale_size_identity() +
-  coord_equal(xlim = c(-1.4, 1.4), ylim = c(-1.4, 1.4), clip = "off") +
+  coord_equal(xlim = c(-1.4, 1.4), ylim = c(-2.2, 1.4), clip = "off") +
   theme_void(base_size = BASE_PT, base_family = FONT_FAMILY) +
   theme(plot.title = element_text(size = TITLE_PT, hjust = 0),
         plot.margin = margin(2, 2, 2, 2, unit = "mm"))

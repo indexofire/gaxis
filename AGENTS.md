@@ -173,7 +173,7 @@ src/gaxis/
   repro/     runner.py (orchestration), batch.py, synthetic.py, compare.py, grade.py
   sandbox/   base.py (port), podman.py, local.py, scan.py, image.py
   kb/         gbrain pages, ingestion, templates, adoption, feedback
-integrations/ reference host adapters (bacmap), tested against a live server
+integrations/ reference host adapters (bacmap client, results exporter), tested against a live server
 examples/     demo inputs (examples/demo) + a reference gbrain page derived from a manifest
 vendor/       untracked: gbrain checkout + pinned bun (pixi run gbrain-install)
 scripts/      review_matrix, freeze_contract, corpus curation, gbrain wrappers

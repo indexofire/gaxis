@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **bacmap → gaxis handoff**: `integrations/bacmap_export.py` converts a bacmap results run into
+  `amr_long.csv` + `metadata.csv`; tutorial 10 runs the real 20-Salmonella AMR network without
+  re-calling AMR tools.
 - **Shared category palette**: AMR analysis writes `palette.json` (class → hex);
   `gaxis render --color-map palette.json` reuses it for network nodes and tree annotation strips,
   so the same class keeps the same colour across figures. Contract v2.5.

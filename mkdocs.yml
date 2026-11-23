@@ -95,6 +95,7 @@ plugins:
             LLM reconstruction: LLM 重建
             AMR co-occurrence network: AMR 共现网络
             SNP tree workflow: SNP 树工作流
+            bacmap results to network: bacmap 结果 → 网络图
 
 markdown_extensions:
   - admonition
@@ -142,6 +143,7 @@ nav:
       - LLM reconstruction: tutorial/07-llm-reconstruction.md
       - AMR co-occurrence network: tutorial/08-amr-network.md
       - SNP tree workflow: tutorial/09-snp-tree-workflow.md
+      - bacmap results to network: tutorial/10-bacmap-export.md
   - Reference:
       - CLI: reference/cli.md
       - Configuration: reference/configuration.md

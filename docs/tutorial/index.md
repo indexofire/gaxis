@@ -13,6 +13,7 @@ The tutorials map to gaxis's two main workflows, the analysis-recipe bridge, and
 | [07 LLM reconstruction](07-llm-reconstruction.md) | Figure code when author code is missing or broken (labelled `llm_*`) | Yes | No |
 | [08 AMR co-occurrence network](08-amr-network.md) | Table → co-occurrence edges → network figure, no AMR re-calling | No | No |
 | [09 SNP tree workflow](09-snp-tree-workflow.md) | Snakemake scaffold + validation, Newick conversion, annotated tree figure | No | No |
+| [10 bacmap results to network](10-bacmap-export.md) | Real bacmap AMR tables → co-occurrence network, no re-calling | No | No |
 
 ## Recommended practice order
 
