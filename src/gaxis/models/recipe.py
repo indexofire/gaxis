@@ -22,6 +22,7 @@ class FigureRecipe(BaseModel):
     weight: str | None = None
     annotations: list[str] = Field(default_factory=list)
     preset: str = "default"
+    rotate_labels: int = 0
     required_columns: list[str] = Field(default_factory=list)
     optional_columns: list[str] = Field(default_factory=list)
 

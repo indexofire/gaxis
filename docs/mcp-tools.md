@@ -1,4 +1,4 @@
-# MCP tool reference — contract v2.6
+# MCP tool reference — contract v2.7
 
 Frozen surface between the gaxis kernel and every host. Source of truth:
 `src/gaxis/models/tools.py`; snapshot: `tests/contract_snapshot.json`; refresh with
@@ -391,6 +391,7 @@ then renders with the recipe's encodings/preset. The manifest records `recipe_id
 | v1.5 | M1 completion | identifier resolution (Crossref/arXiv/PubMed/PMC/Unpaywall), PDF download, repository link + plotting-script discovery; ingest result gains `pdf_url`, `repository_urls`, `code_candidate_count`, request gains `with_code` |
 | v1.7 | design tiering | `ChartAssetSummary` gains `design_score` and `design_tier` (gold/dense/reject) |
 | v1.8 | usefulness | `ChartAssetSummary` gains `usefulness_score`; retrieval ranks by design × usefulness |
+| v2.7 | rotated labels | `RenderRequest.rotate_labels` (x tick angle 0–90) |
 | v2.6 | figure recipes | + `list_figure_recipes`, `render_figure_recipe` (curated table→figure contracts) |
 | v2.5 | shared palette | `RenderRequest.color_map` (category → hex) for consistent annotation/node colours |
 | v2.4 | tree annotations | `RenderRequest.annotations` (multiple tip annotation columns) |

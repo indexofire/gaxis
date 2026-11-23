@@ -1,4 +1,4 @@
-"""MCP server for gaxis: twelve tools over contract v2.6 (ADR-02, ADR-05, ADR-14).
+"""MCP server for gaxis: twelve tools over contract v2.7 (ADR-02, ADR-05, ADR-14).
 
 Run it as a production service:
 
@@ -102,6 +102,7 @@ def build_server() -> MCPServer:
         weight: str | None = None,
         annotations: list[str] | None = None,
         color_map: dict[str, str] | None = None,
+        rotate_labels: int = 0,
         title: str | None = None,
         xlabel: str | None = None,
         ylabel: str | None = None,
@@ -126,6 +127,7 @@ def build_server() -> MCPServer:
             weight=weight,
             annotations=annotations,
             color_map=color_map,
+            rotate_labels=rotate_labels,
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
@@ -404,7 +406,7 @@ def build_server() -> MCPServer:
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
-        prog="gaxis-mcp", description="gaxis MCP server (contract v2.6)"
+        prog="gaxis-mcp", description="gaxis MCP server (contract v2.7)"
     )
     parser.add_argument("--transport", choices=["http", "stdio"], default="http")
     parser.add_argument("--host", default="127.0.0.1")

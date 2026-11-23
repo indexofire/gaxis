@@ -33,6 +33,7 @@ SPEC <- list(
   weight = @WEIGHT@,
   annotations = c(@ANNOTATIONS@),
   color_map = @COLOR_MAP@,
+  rotate_labels = @ROTATE_LABELS@,
   title = @TITLE@,
   xlabel = @XLABEL@,
   ylabel = @YLABEL@,
@@ -114,6 +115,11 @@ summarise_groups <- function(df) {
 theme_paper <- theme_classic(base_size = BASE_PT, base_family = FONT_FAMILY) +
   theme(
     axis.text = element_text(colour = "black", size = BASE_PT),
+    axis.text.x = if (SPEC$rotate_labels > 0) {
+      element_text(colour = "black", size = BASE_PT, angle = SPEC$rotate_labels, hjust = 1)
+    } else {
+      element_text(colour = "black", size = BASE_PT)
+    },
     axis.title = element_text(colour = "black", size = LABEL_PT),
     axis.line = element_line(linewidth = pt_to_lwd(SPINE_WIDTH), colour = "black"),
     axis.ticks = element_line(linewidth = pt_to_lwd(SPINE_WIDTH), colour = "black"),

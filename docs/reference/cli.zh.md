@@ -25,7 +25,7 @@
 | 选项 | 说明 |
 |---|---|
 | `--chart {bar,stacked_bar,line,scatter,box,heatmap,network,tree}` | 图型（默认由数据推断；network/tree 需显式指定） |
-| `--x/--y/--hue/--yerr/--weight/--annotation/--color-map` | 编码列名；`--color-map` 是 JSON（类别→hex），可跨图共享 |
+| `--x/--y/--hue/--yerr/--weight/--annotation/--color-map/--rotate-labels` | 编码列名；`--color-map` 是类别→hex JSON；`--rotate-labels` 是 x 刻度旋转角度 |
 | `--backend python\|r` | matplotlib 或 ggplot2 |
 | `--preset NAME` | 期刊预设（默认 `default`） |
 | `--palette NAME` | 覆盖预设调色板 |
@@ -95,6 +95,15 @@
 ### `gaxis reproduce MANIFEST_ID --code SCRIPT [--data FILE] [--engine podman\|local] [--allow-network]`
 
 单图复现 → 分级 → 自动资产化 + KB 刷新。
+
+### `gaxis recipe list` / `gaxis recipe render`
+
+| 命令 | 说明 |
+|---|---|
+| `gaxis recipe list [--chart TYPE] [--json]` | 策展的"表 → 图"契约 |
+| `gaxis recipe render amr-network --data edges.csv [--color-map palette.json] [--out DIR] [--dry-run]` | 检查必需列后出图 |
+
+`recipe render` 与 MCP 的 `list_figure_recipes` / `render_figure_recipe` 使用同一套契约。
 
 ### `gaxis analysis list` / `gaxis analysis run`
 

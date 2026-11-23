@@ -45,6 +45,22 @@ Real example (20 Salmonellae, 121 AMR rows, 9 genes / 20 edges at `--min-prevale
 `--min-prevalence` is both a scientific and a layout choice: lower values show more genes and a
 denser network; raise it for a readable main figure, keep the dense version as a supplement.
 
+## Multi-panel figure (network + prevalence)
+
+```bash
+pixi run gaxis recipe render amr-network   --data data/analysis/<amr>/edges.csv --color-map data/analysis/<amr>/palette.json   --out data/panels
+pixi run gaxis recipe render amr-prevalence-bar   --data data/analysis/<amr>/nodes.csv --color-map data/analysis/<amr>/palette.json   --out data/panels
+
+pixi run gaxis compose \
+  --panels data/panels/<network-id>/manifest.json,data/panels/<bar-id>/manifest.json \
+  --layout 1x2 --preset asm --uniform --out data/figures
+```
+
+`--uniform` re-renders both panels at the composition preset/cell size, and the bar recipe rotates
+long gene labels by 90° so a 1×2 page stays readable.
+
+![bacmap composite example](/gaxis/assets/example-bacmap-composite.png)
+
 ## What stays in bacmap
 
 - assembly, typing, serotype, AMR calling, cgMLST;

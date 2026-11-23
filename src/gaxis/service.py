@@ -815,6 +815,7 @@ def render(request: RenderRequest, *, execute: bool = True) -> RenderResult:
         weight=request.weight,
         annotations=list(request.annotations),
         color_map=dict(request.color_map),
+        rotate_labels=request.rotate_labels,
         title=request.title,
         xlabel=request.xlabel,
         ylabel=request.ylabel,
@@ -1527,6 +1528,7 @@ def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureReci
         update={
             "annotations": list(recipe.annotations),
             "color_map": dict(request.color_map),
+            "rotate_labels": recipe.rotate_labels,
         }
     )
     result = render_spec(

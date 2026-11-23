@@ -22,6 +22,7 @@ x = "gene"
 y = "prevalence"
 hue = "gene_class"
 preset = "asm"
+rotate_labels = 90
 required = ["gene", "prevalence"]
 optional = ["gene_class", "samples"]
 

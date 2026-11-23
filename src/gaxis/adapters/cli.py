@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.6) with data classes."""
+    """Print the frozen MCP tool contract (v2.7) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -701,6 +701,7 @@ def render_cmd(
     color_map: Path | None = typer.Option(
         None, "--color-map", help="JSON object mapping category -> hex colour"
     ),
+    rotate_labels: int = typer.Option(0, "--rotate-labels", help="x tick label angle (0-90)"),
     backend: str = typer.Option("python", "--backend", help="python (matplotlib) or r (ggplot2)"),
     preset: str = typer.Option("default", "--preset", "-p"),
     palette: str | None = typer.Option(None, "--palette"),
@@ -1064,6 +1065,73 @@ def analysis_run_cmd(
             "next:    gaxis render --chart tree --data "
             f"{run.outputs['tree_edges']} --x parent --y child --weight branch_length"
         )
+
+
+recipe_app = typer.Typer(help="Curated table-to-figure recipes (same contracts as MCP)")
+app.add_typer(recipe_app, name="recipe")
+
+
+@recipe_app.command("list")
+def recipe_list(
+    chart: str | None = typer.Option(None, "--chart"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """List figure recipes and their input contracts."""
+    from ..models.recipe import ListFigureRecipesRequest
+
+    result = service.figure_recipes(
+        ListFigureRecipesRequest(chart_type=chart)  # type: ignore[arg-type]
+    )
+    if as_json:
+        _echo_json(json.loads(result.model_dump_json()))
+        return
+    for recipe in result.recipes:
+        typer.echo(
+            f"{recipe.recipe_id}: {recipe.title}  [{recipe.chart_type.value}, {recipe.preset}]"
+        )
+        typer.echo(f"  required: {', '.join(recipe.required_columns)}")
+        if recipe.optional_columns:
+            typer.echo(f"  optional: {', '.join(recipe.optional_columns)}")
+        if recipe.description:
+            typer.echo(f"  {recipe.description}")
+
+
+@recipe_app.command("render")
+def recipe_render(
+    recipe_id: str = typer.Argument(..., help="recipe id, e.g. amr-network"),
+    data: Path = typer.Option(..., "--data", "-d"),
+    preset: str | None = typer.Option(None, "--preset", "-p"),
+    color_map: Path | None = typer.Option(None, "--color-map"),
+    out: Path | None = typer.Option(None, "--out"),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """Render a curated recipe after checking its required columns."""
+    from ..models.recipe import RenderFigureRecipeRequest
+
+    try:
+        result = service.render_figure_recipe(
+            RenderFigureRecipeRequest(
+                recipe_id=recipe_id,
+                data_path=str(data),
+                preset=preset,
+                out_dir=str(out) if out else None,
+                color_map=(json.loads(color_map.read_text(encoding="utf-8")) if color_map else {}),
+                dry_run=dry_run,
+            )
+        )
+    except GaxisError as exc:
+        _fail(exc)
+        return
+    if as_json:
+        _echo_json(json.loads(result.model_dump_json()))
+        return
+    typer.echo(f"recipe: {result.recipe_id}")
+    typer.echo(f"figure: {result.figure_id}")
+    typer.echo(f"code:   {result.code_path}")
+    for output in result.outputs:
+        typer.echo(f"wrote:  {output.path}")
+    typer.echo(result.lint.format_text())
 
 
 @app.command("reconstruct")

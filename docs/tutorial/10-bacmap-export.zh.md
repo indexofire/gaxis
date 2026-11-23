@@ -44,6 +44,21 @@ pixi run gaxis render \
 
 `--min-prevalence` 既是科学选择也是排版选择：调低会显示更多基因、网络更密；主图可调高，密集版本放补充材料。
 
+## 多面板（网络 + 流行率）
+
+```bash
+pixi run gaxis recipe render amr-network   --data data/analysis/<amr>/edges.csv --color-map data/analysis/<amr>/palette.json   --out data/panels
+pixi run gaxis recipe render amr-prevalence-bar   --data data/analysis/<amr>/nodes.csv --color-map data/analysis/<amr>/palette.json   --out data/panels
+
+pixi run gaxis compose \
+  --panels data/panels/<network-id>/manifest.json,data/panels/<bar-id>/manifest.json \
+  --layout 1x2 --preset asm --uniform --out data/figures
+```
+
+`--uniform` 会按合成预设与单元格尺寸重渲染两个面板；条形图 recipe 默认把长基因名旋转 90°，1×2 页面仍然可读。
+
+![bacmap 多面板示例](/gaxis/assets/example-bacmap-composite.png)
+
 ## 仍留在 bacmap 的事
 
 - 组装、分型、血清型、AMR 调用、cgMLST；

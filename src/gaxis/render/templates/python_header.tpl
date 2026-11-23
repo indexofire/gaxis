@@ -113,6 +113,10 @@ def finish(ax, *, xlabel: str | None = None, ylabel: str | None = None) -> None:
         ax.set_xlabel(xlabel)
     if ylabel:
         ax.set_ylabel(ylabel)
+    if SPEC.get("rotate_labels", 0):
+        for label in ax.get_xticklabels():
+            label.set_rotation(SPEC["rotate_labels"])
+            label.set_ha("right")
     if SPEC["hue"] and ax.get_legend() is None:
         ax.legend(
             title=SPEC["hue"],

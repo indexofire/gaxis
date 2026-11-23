@@ -25,7 +25,7 @@ Profile a table: column types, cardinality, unit hints, recommended chart types.
 | Option | Description |
 |---|---|
 | `--chart {bar,stacked_bar,line,scatter,box,heatmap,network,tree}` | Chart type (inferred; network/tree must be explicit) |
-| `--x/--y/--hue/--yerr/--weight/--annotation/--color-map` | Encoded columns; `--color-map` is a JSON category→hex map (shared across figures) |
+| `--x/--y/--hue/--yerr/--weight/--annotation/--color-map/--rotate-labels` | Encoded columns; `--color-map` is category→hex JSON; `--rotate-labels` is an x tick angle |
 | `--backend python\|r` | matplotlib or ggplot2 |
 | `--preset NAME` | Journal preset (default `default`) |
 | `--palette NAME` | Override the preset palette |
@@ -95,6 +95,15 @@ View the full manifest of a paper figure by id (code candidates, reproduction le
 ### `gaxis reproduce MANIFEST_ID --code SCRIPT [--data FILE] [--engine podman\|local] [--allow-network]`
 
 Single-figure reproduction → grading → automatic assetization + KB refresh.
+
+### `gaxis recipe list` / `gaxis recipe render`
+
+| Command | Meaning |
+|---|---|
+| `gaxis recipe list [--chart TYPE] [--json]` | curated table→figure contracts |
+| `gaxis recipe render amr-network --data edges.csv [--color-map palette.json] [--out DIR] [--dry-run]` | check required columns, then render |
+
+`recipe render` uses the same contracts as `list_figure_recipes` / `render_figure_recipe` over MCP.
 
 ### `gaxis analysis list` / `gaxis analysis run`
 

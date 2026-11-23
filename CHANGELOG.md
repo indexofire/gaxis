@@ -26,6 +26,9 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Recipe CLI + rotated labels**: `gaxis recipe list/render` (same contracts as MCP);
+  `--rotate-labels` (0–90°) for long categorical labels, used by the AMR prevalence recipe;
+  contract v2.7. Tutorial 10 adds a two-panel network + prevalence composition.
 - **Figure recipes over MCP**: `list_figure_recipes` (D1) and `render_figure_recipe` (D3) expose
   curated table→figure contracts (`amr-network`, `amr-prevalence-bar`, `snp-tree`) from
   `style/figure_recipes.toml`; required columns are checked before rendering and the manifest records

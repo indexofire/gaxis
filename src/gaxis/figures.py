@@ -25,6 +25,7 @@ def load_figure_recipes() -> list[FigureRecipe]:
                 weight=entry.get("weight"),
                 annotations=list(entry.get("annotations", [])),
                 preset=entry.get("preset", "default"),
+                rotate_labels=int(entry.get("rotate_labels", 0)),
                 required_columns=list(entry.get("required", [])),
                 optional_columns=list(entry.get("optional", [])),
             )

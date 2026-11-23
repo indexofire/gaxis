@@ -60,3 +60,23 @@ def test_dry_run_does_not_execute(tmp_path: Path) -> None:
     )
     assert result.outputs == []
     assert Path(result.code_path).is_file()
+
+
+def test_recipe_render_honours_rotate_labels(tmp_path: Path) -> None:
+    nodes = tmp_path / "nodes.csv"
+    nodes.write_text(
+        "gene,prevalence,gene_class,very_long_gene_name\n"
+        "blaCTX-M-14,0.5,BETA-LACTAM,x\n"
+        "blaTEM-1,0.4,BETA-LACTAM,x\n",
+        encoding="utf-8",
+    )
+    result = render_figure_recipe(
+        RenderFigureRecipeRequest(
+            recipe_id="amr-prevalence-bar",
+            data_path=str(nodes),
+            out_dir=str(tmp_path / "rotated"),
+            dry_run=True,
+        )
+    )
+    code = Path(result.code_path).read_text(encoding="utf-8")
+    assert "'rotate_labels': 90" in code or '"rotate_labels": 90' in code
