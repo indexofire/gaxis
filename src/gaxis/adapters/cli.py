@@ -117,7 +117,7 @@ def palettes(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def tools(as_json: bool = typer.Option(True, "--json/--table")) -> None:
-    """Print the frozen MCP tool contract (v2.8) with data classes."""
+    """Print the frozen MCP tool contract (v2.9) with data classes."""
     catalog = service.tool_catalog()
     if as_json:
         _echo_json(catalog)
@@ -1086,9 +1086,8 @@ def recipe_list(
         _echo_json(json.loads(result.model_dump_json()))
         return
     for recipe in result.recipes:
-        typer.echo(
-            f"{recipe.recipe_id}: {recipe.title}  [{recipe.chart_type.value}, {recipe.preset}]"
-        )
+        kind = recipe.chart_type.value if recipe.chart_type else recipe.kind
+        typer.echo(f"{recipe.recipe_id}: {recipe.title}  [{kind}, {recipe.preset}]")
         typer.echo(f"  required: {', '.join(recipe.required_columns)}")
         if recipe.optional_columns:
             typer.echo(f"  optional: {', '.join(recipe.optional_columns)}")
@@ -1099,9 +1098,12 @@ def recipe_list(
 @recipe_app.command("render")
 def recipe_render(
     recipe_id: str = typer.Argument(..., help="recipe id, e.g. amr-network"),
-    data: Path = typer.Option(..., "--data", "-d"),
+    data: Path | None = typer.Option(None, "--data", "-d", help="input table (or analysis input)"),
     preset: str | None = typer.Option(None, "--preset", "-p"),
     color_map: Path | None = typer.Option(None, "--color-map"),
+    table: list[str] | None = typer.Option(
+        None, "--table", help="key=path input for a composite recipe (repeatable)"
+    ),
     out: Path | None = typer.Option(None, "--out"),
     run_analysis: bool = typer.Option(
         False,
@@ -1117,6 +1119,13 @@ def recipe_render(
     """Render a curated recipe after checking its required columns."""
     from ..models.recipe import RenderFigureRecipeRequest
 
+    inputs: dict[str, str] = {}
+    for item in table or []:
+        key, separator, raw = item.partition("=")
+        if not separator:
+            _fail(GaxisError("bad_parameter", f"expected key=path, got {item!r}"))
+            return
+        inputs[key.strip()] = raw.strip()
     params: dict[str, Any] = {}
     for item in analysis_param or []:
         key, separator, raw = item.partition("=")
@@ -1131,12 +1140,13 @@ def recipe_render(
         result = service.render_figure_recipe(
             RenderFigureRecipeRequest(
                 recipe_id=recipe_id,
-                data_path=str(data),
+                data_path=str(data) if data else "",
                 preset=preset,
                 out_dir=str(out) if out else None,
                 color_map=(json.loads(color_map.read_text(encoding="utf-8")) if color_map else {}),
                 run_analysis=run_analysis,
                 analysis_params=params,
+                inputs=inputs,
                 dry_run=dry_run,
             )
         )

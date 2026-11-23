@@ -55,6 +55,7 @@ from .models.lint import LintReport
 from .models.manifest import FigureManifest, FigureSource, OutputFile
 from .models.paper import ChartReproManifest, CodeCandidate
 from .models.recipe import (
+    FigureRecipe,
     ListFigureRecipesRequest,
     ListFigureRecipesResult,
     RenderFigureRecipeRequest,
@@ -1496,6 +1497,212 @@ def figure_recipes(request: ListFigureRecipesRequest | None = None) -> ListFigur
     return ListFigureRecipesResult(recipes=recipes, total=len(recipes))
 
 
+def _recipe_spec(
+    recipe: FigureRecipe,
+    schema: DataSchema,
+    *,
+    preset: str,
+    color_map: dict[str, str],
+    width_mm: float | None = None,
+    height_mm: float | None = None,
+):
+    if recipe.chart_type is None:
+        raise GaxisError("invalid_recipe", f"{recipe.recipe_id} has no chart_type")
+    spec = infer_spec(
+        schema,
+        chart_type=recipe.chart_type,
+        x=recipe.x,
+        y=recipe.y,
+        hue=recipe.hue,
+        weight=recipe.weight,
+        preset=preset,
+        width_mm=width_mm,
+        height_mm=height_mm,
+    )
+    return spec.model_copy(
+        update={
+            "annotations": list(recipe.annotations),
+            "color_map": dict(color_map),
+            "rotate_labels": recipe.rotate_labels,
+        }
+    )
+
+
+def _render_recipe_single(
+    recipe: FigureRecipe,
+    data_path: Path,
+    *,
+    preset: str,
+    color_map: dict[str, str],
+    out_dir: Path | None,
+    width_mm: float | None = None,
+    height_mm: float | None = None,
+    dry_run: bool = False,
+):
+    schema = describe_data(str(data_path))
+    missing = [name for name in recipe.required_columns if not schema.has(name)]
+    if missing:
+        raise GaxisError(
+            "recipe_contract_violation",
+            f"{recipe.recipe_id} requires columns {missing}",
+            hint=f"available columns: {[column.name for column in schema.columns]}",
+        )
+    spec = _recipe_spec(
+        recipe,
+        schema,
+        preset=preset,
+        color_map=color_map,
+        width_mm=width_mm,
+        height_mm=height_mm,
+    )
+    return render_spec(
+        schema,
+        spec,
+        out_dir=out_dir,
+        source="figure_recipe",
+        execute=not dry_run,
+    )
+
+
+def _run_recipe_analysis(recipe: FigureRecipe, data_path: Path, overrides: dict[str, Any]):
+    if not recipe.analysis_recipe:
+        raise GaxisError(
+            "analysis_not_supported",
+            f"{recipe.recipe_id} has no analysis recipe",
+            hint="pass an already analysed table instead",
+        )
+    params = {**recipe.analysis_params, **overrides}
+    try:
+        return analysis_run(
+            recipe.analysis_recipe,
+            input_path=data_path,
+            params=AmrCooccurrenceParams(**params),
+        )
+    except TypeError as exc:
+        raise GaxisError("bad_parameter", f"analysis params: {exc}") from exc
+
+
+def _render_composite(
+    recipe: FigureRecipe, request: RenderFigureRecipeRequest
+) -> RenderFigureRecipeResult:
+    if request.dry_run:
+        raise GaxisError(
+            "dry_run_not_supported",
+            "composite recipes need a real panel render before composition",
+        )
+    preset = request.preset or recipe.preset
+    layout = None
+    if recipe.layout:
+        try:
+            rows, cols = recipe.layout.lower().split("x", 1)
+            layout = (int(rows), int(cols))
+        except ValueError as exc:
+            raise GaxisError("bad_layout", f"bad recipe layout {recipe.layout!r}") from exc
+    panels = [
+        next(
+            (item for item in load_figure_recipes() if item.recipe_id == panel.recipe_id),
+            None,
+        )
+        for panel in recipe.panels
+    ]
+    if any(panel is None for panel in panels) or not panels:
+        raise GaxisError("unknown_recipe", f"{recipe.recipe_id} has an invalid panel recipe")
+    analysis_run_id = None
+    available: dict[str, Path] = {}
+    if request.run_analysis:
+        analysis = _run_recipe_analysis(recipe, Path(request.data_path), request.analysis_params)
+        analysis_run_id = analysis.run_id
+        available = {key: Path(value) for key, value in analysis.outputs.items()}
+    else:
+        available = {key: Path(value) for key, value in request.inputs.items()}
+    geometry = page_geometry(
+        len(panels),
+        preset_name=preset,
+        layout=layout,
+        width_mm=None,
+        height_mm=None,
+    )
+    target = (
+        Path(request.out_dir).expanduser().resolve()
+        if request.out_dir
+        else (settings().renders_dir / "compositions")
+    )
+    panel_out = target / "panels"
+    rendered = []
+    panel_payload = []
+    for panel_recipe, panel_spec in zip(panels, recipe.panels, strict=True):
+        if panel_recipe is None:
+            raise GaxisError("unknown_recipe", f"panel {panel_spec.recipe_id!r} not found")
+        key = panel_spec.input_key or panel_recipe.analysis_output or "data"
+        data_path = available.get(key)
+        if data_path is None or not data_path.is_file():
+            raise GaxisError(
+                "recipe_input_missing",
+                f"{recipe.recipe_id} needs input {key!r}",
+                hint="pass --input key=path or run the recipe analysis",
+            )
+        result = _render_recipe_single(
+            panel_recipe,
+            data_path,
+            preset=preset,
+            color_map=request.color_map,
+            out_dir=panel_out,
+            width_mm=geometry.cell_w_mm,
+            height_mm=geometry.cell_h_mm,
+        )
+        result.manifest.recipe_id = panel_recipe.recipe_id
+        result.manifest.analysis_run_id = analysis_run_id
+        Path(result.manifest_path).write_text(
+            result.manifest.model_dump_json(indent=2), encoding="utf-8"
+        )
+        rendered.append(result.manifest_path)
+        panel_payload.append(
+            {
+                "recipe_id": panel_recipe.recipe_id,
+                "label": panel_spec.label,
+                "figure_id": result.figure_id,
+                "code_path": result.code_path,
+            }
+        )
+    composition = compose(
+        rendered,
+        preset=preset,
+        out_dir=target,
+        layout=layout,
+        width_mm=geometry.width_mm,
+        height_mm=geometry.height_mm,
+        labels=True,
+        uniform=False,
+    )
+    outputs = []
+    for path in (composition.output_pdf, composition.output_png):
+        if path and Path(path).is_file():
+            width, height, dpi = measure_output(Path(path))
+            outputs.append(
+                OutputFile(
+                    path=path,
+                    format=Path(path).suffix.lstrip("."),
+                    bytes=Path(path).stat().st_size,
+                    width_mm=width,
+                    height_mm=height,
+                    dpi=dpi,
+                )
+            )
+    return RenderFigureRecipeResult(
+        recipe_id=recipe.recipe_id,
+        figure_id=composition.composition_id,
+        outputs=outputs,
+        lint=composition.lint,
+        manifest=composition.model_dump(mode="json"),
+        source="figure_recipe",
+        analysis_run_id=analysis_run_id,
+        kind="composite",
+        panels=panel_payload,
+        composition=composition.model_dump(mode="json"),
+        not_implemented=False,
+    )
+
+
 def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureRecipeResult:
     """Render a curated recipe after checking its input contract."""
     recipe = next(
@@ -1508,25 +1715,13 @@ def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureReci
             f"unknown figure recipe {request.recipe_id!r}",
             hint="call list_figure_recipes",
         )
+    if recipe.kind == "composite":
+        return _render_composite(recipe, request)
     analysis_run_id: str | None = None
     data_path = Path(request.data_path)
     if request.run_analysis:
-        if not recipe.analysis_recipe or not recipe.analysis_output:
-            raise GaxisError(
-                "analysis_not_supported",
-                f"{recipe.recipe_id} has no analysis recipe",
-                hint="pass an already analysed table instead",
-            )
-        params = {**recipe.analysis_params, **request.analysis_params}
-        try:
-            analysis = analysis_run(
-                recipe.analysis_recipe,
-                input_path=data_path,
-                params=AmrCooccurrenceParams(**params),
-            )
-        except TypeError as exc:
-            raise GaxisError("bad_parameter", f"analysis params: {exc}") from exc
-        output = analysis.outputs.get(recipe.analysis_output)
+        analysis = _run_recipe_analysis(recipe, data_path, request.analysis_params)
+        output = analysis.outputs.get(recipe.analysis_output or "")
         if not output:
             raise GaxisError(
                 "analysis_output_missing",
@@ -1534,35 +1729,13 @@ def render_figure_recipe(request: RenderFigureRecipeRequest) -> RenderFigureReci
             )
         data_path = Path(output)
         analysis_run_id = analysis.run_id
-    schema = describe_data(str(data_path))
-    missing = [name for name in recipe.required_columns if not schema.has(name)]
-    if missing:
-        raise GaxisError(
-            "recipe_contract_violation",
-            f"{recipe.recipe_id} requires columns {missing}",
-            hint=f"available columns: {[column.name for column in schema.columns]}",
-        )
-    spec = infer_spec(
-        schema,
-        chart_type=recipe.chart_type,
-        x=recipe.x,
-        y=recipe.y,
-        hue=recipe.hue,
-        weight=recipe.weight,
+    result = _render_recipe_single(
+        recipe,
+        data_path,
         preset=request.preset or recipe.preset,
-    ).model_copy(
-        update={
-            "annotations": list(recipe.annotations),
-            "color_map": dict(request.color_map),
-            "rotate_labels": recipe.rotate_labels,
-        }
-    )
-    result = render_spec(
-        schema,
-        spec,
+        color_map=request.color_map,
         out_dir=Path(request.out_dir).expanduser().resolve() if request.out_dir else None,
-        source="figure_recipe",
-        execute=not request.dry_run,
+        dry_run=request.dry_run,
     )
     result.manifest.recipe_id = recipe.recipe_id
     result.manifest.analysis_run_id = analysis_run_id

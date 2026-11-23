@@ -35,8 +35,18 @@ pixi run gaxis recipe render amr-network \
   --out data/figures
 ```
 
-manifest 会同时记录 `recipe_id` 与 `analysis_run_id`。bacmap 仍可以先算好表，再不带
-`--run-analysis` 调用。
+manifest 会同时记录 `recipe_id` 与 `analysis_run_id`。**复合 recipe** 可以一步出多面板：
+
+```bash
+pixi run gaxis recipe render amr-summary \
+  --data data/bacmap-export/amr_long.csv --run-analysis \
+  --analysis-param min_prevalence=0.3 --color-map palette.json \
+  --out data/figures
+```
+
+它只跑一次共现分析，按合成预设重渲染网络与流行率两个面板，返回带 A/B 标注的 1×2
+`CompositionManifest`。已有表时用 `--table edges=... --table nodes=...`，不带 `--run-analysis`。
+bacmap 仍可以先算好表再调用。
 
 ## 分析与出图
 

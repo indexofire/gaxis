@@ -26,6 +26,10 @@ Format: keep-a-changelog-ish. Versions follow `pyproject.toml`.
   (`https://github. com/owner/repo`) are rejoined before matching; local PDF ingestion now runs
   code discovery too (it previously only ran for DOI/URL sources).
 
+- **Composite recipes**: `amr-summary` runs the co-occurrence analysis once, renders the network
+  and prevalence panels at the composition cell size and returns a 1×2 `CompositionManifest`
+  (`kind`, `panels`, `composition`, A/B labels); `inputs` supports precomputed `edges`/`nodes`.
+  Contract v2.9.
 - **Recipe-driven analysis**: `recipe render --run-analysis` / `render_figure_recipe(run_analysis=true)`
   runs the recipe's associated analysis (`amr-cooccurrence`) first and records `analysis_run_id`
   in the manifest; analysis params are overridable per call. Contract v2.8.

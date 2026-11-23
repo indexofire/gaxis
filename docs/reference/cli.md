@@ -103,6 +103,7 @@ Single-figure reproduction → grading → automatic assetization + KB refresh.
 | `gaxis recipe list [--chart TYPE] [--json]` | curated table→figure contracts |
 | `gaxis recipe render amr-network --data edges.csv [--color-map palette.json] [--out DIR] [--dry-run]` | check required columns, then render |
 | `gaxis recipe render amr-network --data amr_long.csv --run-analysis [--analysis-param k=v]` | run the recipe's analysis first, then render |
+| `gaxis recipe render amr-summary --data amr_long.csv --run-analysis` | composite recipe (1×2) in one call; `--table key=path` reuses precomputed tables |
 
 `recipe render` uses the same contracts as `list_figure_recipes` / `render_figure_recipe` over MCP.
 

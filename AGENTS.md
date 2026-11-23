@@ -25,7 +25,7 @@ Two surfaces, one kernel:
 | `dev/plan.md` | local only, **not committed** | product plan v2.0 (user-owned) |
 | `dev/decisions.md` | local only, **not committed** | decisions and open questions log |
 | `DESIGN.md` | committed | architecture, contracts, module map |
-| `docs/mcp-tools.md` | committed | per-tool reference (v2.8 contract) |
+| `docs/mcp-tools.md` | committed | per-tool reference (v2.9 contract) |
 | `docs/presets.md` | committed | journal presets and lint rules |
 | `docs/bacmap-integration.md` | committed | host wiring, data-class gating, failure modes |
 | `docs/service-flows.md` | committed | the two product flows, tool-by-tool, ready vs planned |
@@ -38,7 +38,7 @@ When `dev/plan.md` and `DESIGN.md` disagree, ask — do not silently pick one.
 These are non-negotiable; a change that violates one needs an explicit decision in
 `dev/decisions.md` first.
 
-1. **Tool contract is frozen.** Twelve tools (v2.8): `health`, `describe_data_schema`,
+1. **Tool contract is frozen.** Twelve tools (v2.9): `health`, `describe_data_schema`,
    `render_chart_from_data`, `plan_chart_from_brief`, `search_chart_assets`,
    `get_chart_manifest`, `ingest_paper`, `reproduce_chart_code`, `adapt_chart_code`,
    `compose_panels`, `list_figure_recipes`, `render_figure_recipe`. Changing names,

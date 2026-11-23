@@ -5,7 +5,7 @@ from __future__ import annotations
 import tomllib
 from importlib import resources
 
-from .models.recipe import FigureRecipe
+from .models.recipe import FigureRecipe, PanelSpec
 
 
 def load_figure_recipes() -> list[FigureRecipe]:
@@ -18,7 +18,7 @@ def load_figure_recipes() -> list[FigureRecipe]:
                 recipe_id=entry["id"],
                 title=entry["title"],
                 description=entry.get("description", ""),
-                chart_type=entry["chart_type"],
+                chart_type=entry.get("chart_type"),
                 x=entry.get("x"),
                 y=entry.get("y"),
                 hue=entry.get("hue"),
@@ -31,6 +31,16 @@ def load_figure_recipes() -> list[FigureRecipe]:
                 analysis_params=dict(entry.get("analysis_params", {})),
                 required_columns=list(entry.get("required", [])),
                 optional_columns=list(entry.get("optional", [])),
+                kind=entry.get("kind", "figure"),
+                panels=[
+                    PanelSpec(
+                        recipe_id=panel["recipe"],
+                        label=panel.get("label", ""),
+                        input_key=panel.get("input_key"),
+                    )
+                    for panel in entry.get("panels", [])
+                ],
+                layout=entry.get("layout"),
             )
         )
     return recipes

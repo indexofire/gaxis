@@ -35,8 +35,20 @@ pixi run gaxis recipe render amr-network \
   --out data/figures
 ```
 
-The manifest records both `recipe_id` and `analysis_run_id`. bacmap can still precompute the
-tables and call `recipe render` without `--run-analysis`.
+The manifest records both `recipe_id` and `analysis_run_id`. A **composite** recipe goes further:
+
+```bash
+pixi run gaxis recipe render amr-summary \
+  --data data/bacmap-export/amr_long.csv --run-analysis \
+  --analysis-param min_prevalence=0.3 --color-map palette.json \
+  --out data/figures
+```
+
+This runs the co-occurrence analysis once, renders the network and prevalence panels at the
+composition preset, and returns a 1×2 `CompositionManifest` with A/B labels. To use already
+computed tables, pass `--table edges=... --table nodes=...` instead of `--run-analysis`.
+
+bacmap can still precompute the tables and call `recipe render` without `--run-analysis`.
 
 ## Analyse and render
 

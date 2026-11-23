@@ -103,6 +103,7 @@
 | `gaxis recipe list [--chart TYPE] [--json]` | 策展的"表 → 图"契约 |
 | `gaxis recipe render amr-network --data edges.csv [--color-map palette.json] [--out DIR] [--dry-run]` | 检查必需列后出图 |
 | `gaxis recipe render amr-network --data amr_long.csv --run-analysis [--analysis-param k=v]` | 先跑 recipe 关联的分析，再出图 |
+| `gaxis recipe render amr-summary --data amr_long.csv --run-analysis` | 一次调用生成 1×2 复合图；`--table key=path` 复用已算好的表 |
 
 `recipe render` 与 MCP 的 `list_figure_recipes` / `render_figure_recipe` 使用同一套契约。
 

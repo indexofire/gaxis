@@ -45,3 +45,16 @@ annotations = ["source"]
 preset = "asm"
 required = ["parent", "child", "branch_length"]
 optional = ["amr_class", "source", "is_tip"]
+
+[[recipe]]
+id = "amr-summary"
+title = "AMR network + prevalence summary"
+description = "One call: co-occurrence analysis, network + prevalence bar, composed 1x2."
+kind = "composite"
+layout = "1x2"
+preset = "asm"
+analysis = "amr-cooccurrence"
+panels = [
+  { recipe = "amr-network", label = "A" },
+  { recipe = "amr-prevalence-bar", label = "B" },
+]

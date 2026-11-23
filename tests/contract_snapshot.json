@@ -1,5 +1,5 @@
 {
-  "contract_version": "v2.8",
+  "contract_version": "v2.9",
   "tools": {
     "adapt_chart_code": {
       "data_class": "D3",
@@ -194,6 +194,7 @@
         "color_map",
         "data_path",
         "dry_run",
+        "inputs",
         "out_dir",
         "preset",
         "recipe_id",
@@ -202,11 +203,14 @@
       "outputs": [
         "analysis_run_id",
         "code_path",
+        "composition",
         "figure_id",
+        "kind",
         "lint",
         "manifest",
         "not_implemented",
         "outputs",
+        "panels",
         "recipe_id",
         "source"
       ]

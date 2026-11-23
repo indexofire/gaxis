@@ -1,4 +1,4 @@
-# MCP tool reference — contract v2.8
+# MCP tool reference — contract v2.9
 
 Frozen surface between the gaxis kernel and every host. Source of truth:
 `src/gaxis/models/tools.py`; snapshot: `tests/contract_snapshot.json`; refresh with
@@ -361,7 +361,7 @@ preset; it never computes analysis. Available: `amr-network`, `amr-prevalence-ba
 // request
 {"recipe_id": "amr-network", "data_path": "/abs/edges.csv", "preset": "asm",
  "color_map": {"beta-lactam": "#E69F00"}, "run_analysis": false,
- "analysis_params": {"min_prevalence": 0.2}, "dry_run": false}
+ "analysis_params": {"min_prevalence": 0.2}, "inputs": {}, "dry_run": false}
 // response
 {"recipe_id": "amr-network", "figure_id": "network-…", "code_path": "…",
  "outputs": [...], "lint": {...}, "manifest": {"recipe_id": "amr-network", ...},
@@ -372,7 +372,8 @@ Checks the recipe's required columns first (`recipe_contract_violation` names th
 then renders with the recipe's encodings/preset. The manifest records `recipe_id` and
 `source: figure_recipe`. With `run_analysis: true`, `data_path` is treated as the analysis input
 (e.g. `sample,gene,gene_class`), the recipe's analysis runs first, and `analysis_run_id` is
-recorded. `dry_run` writes the script/manifest without executing it.
+recorded. Composite recipes (`kind: composite`) accept `inputs` keyed by analysis output
+(`edges`, `nodes`) and return `panels` + `composition`; `dry_run` is refused for composites.
 
 ## 3. Result conventions
 
@@ -394,6 +395,7 @@ recorded. `dry_run` writes the script/manifest without executing it.
 | v1.5 | M1 completion | identifier resolution (Crossref/arXiv/PubMed/PMC/Unpaywall), PDF download, repository link + plotting-script discovery; ingest result gains `pdf_url`, `repository_urls`, `code_candidate_count`, request gains `with_code` |
 | v1.7 | design tiering | `ChartAssetSummary` gains `design_score` and `design_tier` (gold/dense/reject) |
 | v1.8 | usefulness | `ChartAssetSummary` gains `usefulness_score`; retrieval ranks by design × usefulness |
+| v2.9 | composite recipes | `amr-summary` + `inputs`/`kind`/`panels`/`composition` in the recipe result |
 | v2.8 | recipe analysis | `render_figure_recipe` can run the recipe's analysis (`run_analysis`, `analysis_params`); manifest records `analysis_run_id` |
 | v2.7 | rotated labels | `RenderRequest.rotate_labels` (x tick angle 0–90) |
 | v2.6 | figure recipes | + `list_figure_recipes`, `render_figure_recipe` (curated table→figure contracts) |

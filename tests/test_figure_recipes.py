@@ -112,3 +112,37 @@ def test_recipe_without_analysis_rejects_run_analysis(tmp_path: Path) -> None:
             RenderFigureRecipeRequest(recipe_id="snp-tree", data_path=str(table), run_analysis=True)
         )
     assert excinfo.value.code == "analysis_not_supported"
+
+
+def test_composite_recipe_runs_analysis_and_composes(tmp_path: Path) -> None:
+    table = tmp_path / "amr.csv"
+    table.write_text(
+        "sample,gene,gene_class\n"
+        "S1,blaCTX-M,beta-lactam\nS1,sul1,sulfonamide\n"
+        "S2,blaCTX-M,beta-lactam\nS2,sul1,sulfonamide\n"
+        "S3,blaCTX-M,beta-lactam\nS3,sul1,sulfonamide\n",
+        encoding="utf-8",
+    )
+    result = render_figure_recipe(
+        RenderFigureRecipeRequest(
+            recipe_id="amr-summary",
+            data_path=str(table),
+            out_dir=str(tmp_path / "composite"),
+            run_analysis=True,
+        )
+    )
+    assert result.kind == "composite"
+    assert result.figure_id.startswith("composition-")
+    assert [panel["label"] for panel in result.panels] == ["A", "B"]
+    assert result.composition["panels"]
+    assert result.lint.ok, result.lint.format_text()
+
+
+def test_composite_dry_run_is_refused(tmp_path: Path) -> None:
+    table = tmp_path / "amr.csv"
+    table.write_text("sample,gene,gene_class\nS1,a,b\n", encoding="utf-8")
+    with pytest.raises(GaxisError) as excinfo:
+        render_figure_recipe(
+            RenderFigureRecipeRequest(recipe_id="amr-summary", data_path=str(table), dry_run=True)
+        )
+    assert excinfo.value.code == "dry_run_not_supported"
